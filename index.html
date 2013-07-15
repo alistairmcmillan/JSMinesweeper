@@ -79,14 +79,20 @@ function drawField() {
 function userRightClicked(evt) {
     var clickX, clickY;
 	evt.preventDefault();
-    clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
-    clickY = Math.floor((evt.pageY - canvas.offsetTop) / 16);
-	if (guesses[clickX][clickY] === 2) {
-		guesses[clickX][clickY] = 0;
-	} else {
-		guesses[clickX][clickY] = 2;
+
+	// Don't let the player make changes when the game is over
+	if (!gameover) {
+		clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
+		clickY = Math.floor((evt.pageY - canvas.offsetTop) / 16);
+		if (guesses[clickX][clickY] === 2) {
+			guesses[clickX][clickY] = 0;
+		} else if (guesses[clickX][clickY] === 1) {
+			// Do nothing to square that have already been cleared
+		} else {
+			guesses[clickX][clickY] = 2;
+		}
+		drawField();
 	}
-    drawField();
 }
 
 function userLeftClicked(evt) {
