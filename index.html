@@ -7,7 +7,9 @@
 
 <body style="background-color:black;">
 
-<canvas id="canvas" style="border:1px solid black;background-color: white;" width="144" height="144">It appears that your browser doesn't support the canvas element.</canvas>
+<div style="width:144px;width:144px;margin-left:auto;margin-right:auto;">
+<canvas id="canvas" style="border:1px solid black;background-color:white;" width="144" height="144">It appears that your browser doesn't support the canvas element.</canvas>
+</div>
 
 <script>
 
@@ -25,17 +27,21 @@ var FOUR = 8;
 var FIVE = 9;
 var SIX = 10;
 
-var x;
+var x, y;
 var squares = new Array(9);
 for (x = 0; x < 9; x++) {
 	squares[x] = new Array(9);
+}
+var guesses = new Array(9);
+for (x = 0; x < 9; x++) {
+	guesses[x] = new Array(9);
 }
 
 var i, j;
 function isBomb(i, j) {
 	// We don't want to check off the side of the grid
 	if (i > -1 && i < 9 && j > -1 && j < 9) {
-		if(squares[i][j] == BOMB) {
+		if(squares[i][j] === BOMB) {
 			return 1;
 		} else {
 			return 0;
@@ -45,14 +51,47 @@ function isBomb(i, j) {
 	}
 }
 
+var canvas;
+var context;
+var sprite;
+function drawField() {
+	for (x = 0; x < 9; x++) {
+		for (y = 0; y < 9; y++) {
+			if(guesses[x][y] === 1) {
+				context.drawImage(sprite, squares[x][y]*16, 0, 16, 16, x*16, y*16, 16, 16);
+			} else {
+				context.drawImage(sprite, 0*16, 0, 16, 16, x*16, y*16, 16, 16);
+			}
+		}
+	}
+}
+
+function userClicked(evt) {
+	var clickX, clickY;
+	clickX = Math.floor((evt.pageX-canvas.offsetLeft)/16);
+	clickY = Math.floor((evt.pageY-canvas.offsetTop)/16);
+//	alert("userClicked " + Math.floor((evt.pageX-canvas.offsetLeft)/16) + ", " + Math.floor((event.pageY-canvas.offsetTop)/16));
+	if(squares[clickX][clickY] === BOMB) {
+		alert("THE END");
+		for (x = 0; x < 9; x++) {
+			for (y = 0; y < 9; y++) {
+				guesses[clickX][clickY] = 1;
+			}
+		}
+		squares[clickX][clickY] === EXPLODED;
+	} else {
+		guesses[clickX][clickY] = 1;
+	}
+	drawField();
+}
+
 function main() {
-	var x, y;
-	var canvas;
-	var context;
 	canvas = document.getElementById('canvas');
 	context = canvas.getContext('2d');
 
-	var sprite = new Image();
+	canvas.addEventListener("click", userClicked, false);
+
+	sprite = new Image();
 	sprite.src = 'mines.png';
 
 	for (x = 0; x < 9; x++) {
@@ -95,11 +134,7 @@ function main() {
 
 	// Draw minefield
 	sprite.onload = function() {
-		for (x = 0; x < 9; x++) {
-			for (y = 0; y < 9; y++) {
-				context.drawImage(sprite, squares[x][y]*16, 0, 16, 16, x*16, y*16, 16, 16);
-			}
-		}
+		drawField();
 	}
 
 }
