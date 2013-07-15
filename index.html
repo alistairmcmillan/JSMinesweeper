@@ -65,7 +65,9 @@ var sprite;
 function drawField() {
     for (x = 0; x < 9; x += 1) {
         for (y = 0; y < 9; y += 1) {
-            if (guesses[x][y] === 1) {
+            if (guesses[x][y] === 2) {
+                context.drawImage(sprite, 4 * 16, 0, 16, 16, x * 16, y * 16, 16, 16);
+            } else if (guesses[x][y] === 1) {
                 context.drawImage(sprite, squares[x][y] * 16, 0, 16, 16, x * 16, y * 16, 16, 16);
             } else {
                 context.drawImage(sprite, 0 * 16, 0, 16, 16, x * 16, y * 16, 16, 16);
@@ -74,7 +76,21 @@ function drawField() {
     }
 }
 
-function userClicked(evt) {
+function userRightClicked(evt) {
+    var clickX, clickY;
+	evt.preventDefault();
+    clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
+    clickY = Math.floor((evt.pageY - canvas.offsetTop) / 16);
+	if (guesses[clickX][clickY] === 2) {
+		guesses[clickX][clickY] = 0;
+	} else {
+		guesses[clickX][clickY] = 2;
+	}
+    drawField();
+}
+
+function userLeftClicked(evt) {
+	evt.preventDefault();
     var clickX, clickY;
     clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
     clickY = Math.floor((evt.pageY - canvas.offsetTop) / 16);
@@ -87,7 +103,7 @@ function userClicked(evt) {
         squares[clickX][clickY] === EXPLODED;
         gameover = 1;
     } else {
-        if (!gameover) {
+        if (!gameover && guesses[clickX][clickY] != 1) {
             guesses[clickX][clickY] = 1;
             score += 1;
             document.getElementById('scoreboard').style.color = 'white';
@@ -101,7 +117,8 @@ function main() {
     canvas = document.getElementById('canvas');
     context = canvas.getContext('2d');
 
-    canvas.addEventListener("click", userClicked, false);
+    canvas.addEventListener("click", userLeftClicked, false);
+    canvas.addEventListener("contextmenu", userRightClicked, false);
 
     sprite = new Image();
     sprite.src = 'mines.png';
