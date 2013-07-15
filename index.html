@@ -72,10 +72,9 @@ function userClicked(evt) {
 	clickY = Math.floor((evt.pageY-canvas.offsetTop)/16);
 //	alert("userClicked " + Math.floor((evt.pageX-canvas.offsetLeft)/16) + ", " + Math.floor((event.pageY-canvas.offsetTop)/16));
 	if(squares[clickX][clickY] === BOMB) {
-		alert("THE END");
 		for (x = 0; x < 9; x++) {
 			for (y = 0; y < 9; y++) {
-				guesses[clickX][clickY] = 1;
+				guesses[x][y] = 1;
 			}
 		}
 		squares[clickX][clickY] === EXPLODED;
