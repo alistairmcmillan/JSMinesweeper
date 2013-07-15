@@ -25,6 +25,26 @@ var FOUR = 8;
 var FIVE = 9;
 var SIX = 10;
 
+var x;
+var squares = new Array(9);
+for (x = 0; x < 9; x++) {
+	squares[x] = new Array(9);
+}
+
+var i, j;
+function isBomb(i, j) {
+	// We don't want to check off the side of the grid
+	if (i > -1 && i < 9 && j > -1 && j < 9) {
+		if(squares[i][j] == BOMB) {
+			return 1;
+		} else {
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+}
+
 function main() {
 	var x, y;
 	var canvas;
@@ -35,9 +55,7 @@ function main() {
 	var sprite = new Image();
 	sprite.src = 'mines.png';
 
-	var squares = new Array(9);
 	for (x = 0; x < 9; x++) {
-		squares[x] = new Array(9);
 		for (y = 0; y < 9; y++) {
 			squares[x][y] = EMPTY;
 		}
@@ -48,13 +66,34 @@ function main() {
 	while (x < 10) {
 		var randomX = Math.floor(Math.random()*9);
 		var randomY = Math.floor(Math.random()*9);
-//		alert(randomX + "," + randomY)
 		if (squares[randomX][randomY] != BOMB) {
 			squares[randomX][randomY] = BOMB;
 			x++;
 		}
 	}
 
+	// Generate neighbour counts
+	for (x = 0; x < 9; x++) {
+		for (y = 0; y < 9; y++) {
+			if (squares[x][y] != BOMB) {
+				var count = 0;
+				count = count+isBomb( x-1 , y-1 );
+				count = count+isBomb( x   , y-1 );
+				count = count+isBomb( x+1 , y-1 );
+
+				count = count+isBomb( x-1 , y   );
+				count = count+isBomb( x+1 , y   );
+
+				count = count+isBomb( x-1 , y+1 );
+				count = count+isBomb( x   , y+1 );
+				count = count+isBomb( x+1 , y+1 );
+				if(count > 0)
+					squares[x][y] = 4+count;
+			}
+		}
+	}
+
+	// Draw minefield
 	sprite.onload = function() {
 		for (x = 0; x < 9; x++) {
 			for (y = 0; y < 9; y++) {
