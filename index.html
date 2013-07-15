@@ -11,6 +11,8 @@
 
 <script>
 
+"use strict";
+
 var HIDDEN = 0;
 var EMPTY = 1;
 var BOMB = 2;
@@ -23,27 +25,32 @@ var FOUR = 8;
 var FIVE = 9;
 var SIX = 10;
 
-var squares = new Array(9);
-for (var x = 0; x < 9; x++) {
-	squares[x] = new Array(9);
-	for (var y = 0; y < 9; y++) {
-		squares[x][y] = EMPTY;
-	}
-}
-
-function drawfield() {
-	ctx.drawImage(sprites, 0, 0);
-}
-
 function main() {
+	var x, y;
 	var canvas;
+	var context;
 	canvas = document.getElementById('canvas');
-	ctx = canvas.getContext('2d');
+	context = canvas.getContext('2d');
 
-	sprites = new Image();
-	sprites.src = 'mines.png';
-	
-	drawfield();
+	var sprite = new Image();
+	sprite.src = 'mines.png';
+
+	var squares = new Array(9);
+	for (x = 0; x < 9; x++) {
+		squares[x] = new Array(9);
+		for (y = 0; y < 9; y++) {
+			squares[x][y] = EMPTY;
+		}
+	}
+
+	sprite.onload = function() {
+		for (x = 0; x < 9; x++) {
+			for (y = 0; y < 9; y++) {
+				context.drawImage(sprite, 16, 0, 16, 16, x*16, y*16, 16, 16);
+			}
+		}
+	}
+
 }
 
 main();
