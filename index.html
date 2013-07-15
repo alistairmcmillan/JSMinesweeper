@@ -7,7 +7,11 @@
 
 <body style="background-color:black;">
 
-<div style="width:144px;width:144px;margin-left:auto;margin-right:auto;">
+<div id='scoreboard' style="width:144px;margin-left:auto;margin-right:auto;color:black;font-size:25px;text-align:center;">
+0
+</div>
+
+<div style="width:144px;height:144px;margin-left:auto;margin-right:auto;">
 <canvas id="canvas" style="border:1px solid black;background-color:white;" width="144" height="144">It appears that your browser doesn't support the canvas element.</canvas>
 </div>
 
@@ -26,6 +30,9 @@ var THREE = 7;
 var FOUR = 8;
 var FIVE = 9;
 var SIX = 10;
+
+var score = 0;
+var gameover = 0;
 
 var x, y;
 var squares = new Array(9);
@@ -70,7 +77,6 @@ function userClicked(evt) {
 	var clickX, clickY;
 	clickX = Math.floor((evt.pageX-canvas.offsetLeft)/16);
 	clickY = Math.floor((evt.pageY-canvas.offsetTop)/16);
-//	alert("userClicked " + Math.floor((evt.pageX-canvas.offsetLeft)/16) + ", " + Math.floor((event.pageY-canvas.offsetTop)/16));
 	if(squares[clickX][clickY] === BOMB) {
 		for (x = 0; x < 9; x++) {
 			for (y = 0; y < 9; y++) {
@@ -78,8 +84,14 @@ function userClicked(evt) {
 			}
 		}
 		squares[clickX][clickY] === EXPLODED;
+		gameover = 1;
 	} else {
-		guesses[clickX][clickY] = 1;
+		if(!gameover) {
+			guesses[clickX][clickY] = 1;
+			score++;
+			document.getElementById('scoreboard').style.color = 'white';
+			document.getElementById('scoreboard').textContent = score;
+		}
 	}
 	drawField();
 }
