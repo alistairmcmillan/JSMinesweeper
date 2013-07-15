@@ -43,10 +43,22 @@ function main() {
 		}
 	}
 
+	// Generate bomb locations
+	x = 0;
+	while (x < 10) {
+		var randomX = Math.floor(Math.random()*9);
+		var randomY = Math.floor(Math.random()*9);
+//		alert(randomX + "," + randomY)
+		if (squares[randomX][randomY] != BOMB) {
+			squares[randomX][randomY] = BOMB;
+			x++;
+		}
+	}
+
 	sprite.onload = function() {
 		for (x = 0; x < 9; x++) {
 			for (y = 0; y < 9; y++) {
-				context.drawImage(sprite, 16, 0, 16, 16, x*16, y*16, 16, 16);
+				context.drawImage(sprite, squares[x][y]*16, 0, 16, 16, x*16, y*16, 16, 16);
 			}
 		}
 	}
