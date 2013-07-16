@@ -147,8 +147,13 @@ function drawField() {
 		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, 32, 5, 13, 23);
 	}
 
-    var strSeconds = String(seconds);
-    strlen = strSeconds.length;
+    var strSeconds;
+	if(seconds < 1000) {
+	    strSeconds = String(seconds);
+    } else {
+		strSeconds = String(999);
+    }
+   	strlen = strSeconds.length;
 	if (strlen === 3) {
 		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, 435, 5, 13, 23);
 		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, 448, 5, 13, 23);
