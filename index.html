@@ -8,18 +8,29 @@
 
 <body style="background-color:black;">
 
-<div id='scoreboard' style="width:144px;margin-left:auto;margin-right:auto;color:black;font-size:25px;text-align:center;">
-0
+<div style="width:144px;margin-left:auto;margin-right:auto;font-size:25px;color:white;">
+<div id='bombsIdentifiedOutput' style='float:left;text-align:left;'></div><div id='timerOutput'  style='float:right;text-align:right;'>000</div>
 </div>
 
-<div style="width:144px;height:144px;margin-left:auto;margin-right:auto;">
-<canvas id="canvas" style="border:1px solid black;background-color:white;" width="144" height="144">It appears that your browser doesn't support the canvas element.</canvas>
+<div style="width:256px;height:256px;margin-left:auto;margin-right:auto;">
+<canvas id="canvas" style="border:1px solid black;background-color:white;" width="256" height="256">It appears that your browser doesn't support the canvas element.</canvas>
+</div>
+
+<br />
+<br />
+
+<div style="width:144px;margin-left:auto;margin-right:auto;">
+<input style="width:144px;" type="button" onclick="Javascript:newGame()" value="New Game" />
+</div>
+
+<div style="width:144px;margin-left:auto;margin-right:auto;">
+<input style="width:144px;" type="button" onclick="Javascript:testGame()" value="Sample Layout for Testing" />
 </div>
 
 <br />
 
-<div style="width:144px;margin-left:auto;margin-right:auto;">
-<input style="width:144px;" type="button" onclick="document.location.reload(true)" value="New Game" />
+<div id=output style="width:144px;height:144px;margin-left:auto;margin-right:auto;">
+&nbsp;
 </div>
 
 <script>
@@ -27,6 +38,17 @@
 "use strict";
 
 var x, y;
+
+// Beginner: 8 × 8 or 9 × 9 field with 10 mines
+// Intermediate: 16 × 16 field with 40 mines
+// Expert: 30 × 16 field with 99 mines
+
+// 144 x 144
+// 256 x 256
+// 480 x 256
+
+var FIELDSIZE = 16;
+var NUMBEROFBOMBS = 40;
 
 var HIDDEN = 0;
 var EMPTY = 1;
@@ -39,31 +61,35 @@ var THREE = 7;
 var FOUR = 8;
 var FIVE = 9;
 var SIX = 10;
-var squares = new Array(9);
-for (x = 0; x < 9; x += 1) {
-    squares[x] = new Array(9);
+var squares = new Array(FIELDSIZE);
+for (x = 0; x < FIELDSIZE; x += 1) {
+    squares[x] = new Array(FIELDSIZE);
 }
 
 var NOTGUESSED = 0;
 var GUESSED = 1;
 var FLAGGED = 2;
 var MOUSEDOWN = 3;
-var guesses = new Array(9);
-for (x = 0; x < 9; x += 1) {
-    guesses[x] = new Array(9);
-	for (y = 0; y < 9; y += 1) {
-    	guesses[x][y] = NOTGUESSED;
+var guesses;
+
+function resetGuesses() {
+	guesses = new Array(FIELDSIZE);
+	for (x = 0; x < FIELDSIZE; x += 1) {
+		guesses[x] = new Array(FIELDSIZE);
+		for (y = 0; y < FIELDSIZE; y += 1) {
+			guesses[x][y] = NOTGUESSED;
+		}
 	}
 }
 
-var score = 0;
+var bombsIdentified = 0;
 var gameover = 0;
 
 var i, j;
 function isBomb(i, j) {
 	var retVal = 0;
     // We don't want to check off the side of the grid
-    if (i > -1 && i < 9 && j > -1 && j < 9) {
+    if (i > -1 && i < FIELDSIZE && j > -1 && j < FIELDSIZE) {
         if (squares[i][j] === BOMB) {
             retVal = 1;
         }
@@ -77,8 +103,8 @@ var sprite;
 function drawField() {
 	document.getElementById('output').style.color = 'white';
 	var status = '';
-    for (x = 0; x < 9; x += 1) {
-        for (y = 0; y < 9; y += 1) {
+    for (x = 0; x < FIELDSIZE; x += 1) {
+        for (y = 0; y < FIELDSIZE; y += 1) {
             if (guesses[x][y] === MOUSEDOWN) {
                 context.drawImage(sprite, 1 * 16, 0, 16, 16, x * 16, y * 16, 16, 16);
             } else if (guesses[x][y] === FLAGGED) {
@@ -90,6 +116,7 @@ function drawField() {
             }
         }
     }
+	document.getElementById('bombsIdentifiedOutput').innerHTML = bombsIdentified;
 }
 
 function userMousedDown(evt) {
@@ -107,36 +134,62 @@ function userMousedDown(evt) {
 }
 
 function checkForAdjacentBlanks(andy, bob) {
+//	alert(andy + ', ' + bob);
 	var retVal = 0;
 	var r, s;
 	r = andy;
 	s = bob;
-	if(squares[r - 1][s - 1] === EMPTY) {
-		guesses[r - 1][s - 1] = GUESSED;
+	if(s > 0) {
+		if (r > 0) {
+			if(squares[r - 1][s - 1] === EMPTY || squares[r - 1][s - 1] > 4) {
+				guesses[r - 1][s - 1] = GUESSED;
+		//		checkForAdjacentBlanks(r - 1, s - 1);
+			}
+		}
+		if(squares[r][s - 1] === EMPTY || squares[r][s - 1] > 4) {
+			guesses[r][s - 1] = GUESSED;
+		//	checkForAdjacentBlanks(r, s - 1);
+		}
+		if (r < FIELDSIZE-1) {
+			if(squares[r + 1][s - 1] === EMPTY || squares[r + 1][s - 1] > 4) {
+				guesses[r + 1][s - 1] = GUESSED;
+		//		checkForAdjacentBlanks(r + 1, s - 1);
+			}
+		}
 	}
-	if(squares[r][s - 1] === EMPTY) {
-		guesses[r][s - 1] = GUESSED;
+	if (r > 0) {
+		if(squares[r - 1][s] === EMPTY || squares[r - 1][s] > 4) {
+			guesses[r - 1][s] = GUESSED;
+		//	checkForAdjacentBlanks(r - 1, s);
+		}
 	}
-	if(squares[r + 1][s - 1] === EMPTY) {
-		guesses[r + 1][s - 1] = GUESSED;
-	}
-	if(squares[r - 1][s] === EMPTY) {
-		guesses[r - 1][s] = GUESSED;
-	}
-	if(squares[r][s] === EMPTY) {
+	if(squares[r][s] === EMPTY || squares[r][s] > 4) {
 		guesses[r][s] = GUESSED;
+//		checkForAdjacentBlanks(r, s);
 	}
-	if(squares[r + 1][s] === EMPTY) {
-		guesses[r + 1][s] = GUESSED;
+	if (r < FIELDSIZE-1) {
+		if(squares[r + 1][s] === EMPTY || squares[r + 1][s] > 4) {
+			guesses[r + 1][s] = GUESSED;
+		//	checkForAdjacentBlanks(r + 1, s);
+		}
 	}
-	if(squares[r - 1][s + 1] === EMPTY) {
-		guesses[r - 1][s + 1] = GUESSED;
-	}
-	if(squares[r][s + 1] === EMPTY) {
-		guesses[r][s + 1] = GUESSED;
-	}
-	if(squares[r + 1][s + 1] === EMPTY) {
-		guesses[r + 1][s + 1] = GUESSED;
+	if(s < FIELDSIZE-1) {
+		if (r > 0) {
+			if(squares[r - 1][s + 1] === EMPTY || squares[r - 1][s + 1] > 4) {
+				guesses[r - 1][s + 1] = GUESSED;
+		//		checkForAdjacentBlanks(r - 1, s + 1);
+			}
+		}
+		if(squares[r][s + 1] === EMPTY || squares[r][s + 1] > 4) {
+			guesses[r][s + 1] = GUESSED;
+		//	checkForAdjacentBlanks(r, s + 1);
+		}
+		if (r < FIELDSIZE-1) {
+			if(squares[r + 1][s + 1] === EMPTY || squares[r + 1][s + 1] > 4) {
+				guesses[r + 1][s + 1] = GUESSED;
+		//		checkForAdjacentBlanks(r + 1, s + 1);
+			}
+		}
 	}
 }
 
@@ -156,13 +209,14 @@ function userMousedUp(evt) {
 				// Do nothing to square that have already been cleared
 			} else {
 				guesses[clickX][clickY] = FLAGGED;
+				bombsIdentified += 1;
 			}
 		}
 	// If left-click
 	} else {
 		if (squares[clickX][clickY] === BOMB) {
-			for (x = 0; x < 9; x += 1) {
-				for (y = 0; y < 9; y += 1) {
+			for (x = 0; x < FIELDSIZE; x += 1) {
+				for (y = 0; y < FIELDSIZE; y += 1) {
 					guesses[x][y] = GUESSED;
 				}
 			}
@@ -173,11 +227,8 @@ function userMousedUp(evt) {
 			// square is currently hidden
 			if (!gameover && guesses[clickX][clickY] !== GUESSED) {
 				guesses[clickX][clickY] = GUESSED;
-				score += 1;
 				// TODO Check for adjacent blanks
-			//	checkForAdjacentBlanks(clickX, clickY);
-				document.getElementById('scoreboard').style.color = 'white';
-				document.getElementById('scoreboard').textContent = score;
+				checkForAdjacentBlanks(clickX, clickY);
 			}
 		}
 	}
@@ -188,7 +239,12 @@ function userRightClicked(evt) {
 	evt.preventDefault();
 }
 
-function main() {
+function newGame() {
+	gameover = 0;
+	bombsIdentified = 0;
+
+	resetGuesses();
+
     canvas = document.getElementById('canvas');
     context = canvas.getContext('2d');
 
@@ -199,16 +255,16 @@ function main() {
     sprite = new Image();
     sprite.src = 'mines.png';
 
-    for (x = 0; x < 9; x += 1) {
-        for (y = 0; y < 9; y += 1) {
+    for (x = 0; x < FIELDSIZE; x += 1) {
+        for (y = 0; y < FIELDSIZE; y += 1) {
             squares[x][y] = EMPTY;
         }
     }
 
     // Generate bomb locations
     x = 0;
-    while (x < 10) {
-        var randomX = Math.floor(Math.random() * 9), randomY = Math.floor(Math.random() * 9);
+    while (x < NUMBEROFBOMBS) {
+        var randomX = Math.floor(Math.random() * FIELDSIZE), randomY = Math.floor(Math.random() * FIELDSIZE);
         if (squares[randomX][randomY] !== BOMB) {
             squares[randomX][randomY] = BOMB;
             x += 1;
@@ -216,8 +272,8 @@ function main() {
     }
 
     // Generate neighbour counts
-    for (x = 0; x < 9; x += 1) {
-        for (y = 0; y < 9; y += 1) {
+    for (x = 0; x < FIELDSIZE; x += 1) {
+        for (y = 0; y < FIELDSIZE; y += 1) {
             if (squares[x][y] !== BOMB) {
                 var count = 0;
                 count = count + isBomb(x - 1, y - 1);
@@ -242,7 +298,59 @@ function main() {
 
 }
 
-main();
+function testGame() {
+	// Wipe
+    for (x = 0; x < FIELDSIZE; x += 1) {
+        for (y = 0; y < FIELDSIZE; y += 1) {
+            squares[x][y] = EMPTY;
+        }
+    }
+
+	squares[1][4] = BOMB;
+	squares[3][1] = BOMB;
+	squares[3][5] = BOMB;
+	squares[3][7] = BOMB;
+	squares[4][4] = BOMB;
+	squares[7][2] = BOMB;
+	squares[7][5] = BOMB;
+	squares[8][1] = BOMB;
+	squares[8][6] = BOMB;
+	squares[8][7] = BOMB;
+
+	// Generate neighbour counts
+    for (x = 0; x < FIELDSIZE; x += 1) {
+        for (y = 0; y < FIELDSIZE; y += 1) {
+            if (squares[x][y] !== BOMB) {
+                var count = 0;
+                count = count + isBomb(x - 1, y - 1);
+                count = count + isBomb(x, y - 1);
+                count = count + isBomb(x + 1, y - 1);
+
+                count = count + isBomb(x - 1, y);
+                count = count + isBomb(x + 1, y);
+
+                count = count + isBomb(x - 1, y + 1);
+                count = count + isBomb(x, y + 1);
+                count = count + isBomb(x + 1, y + 1);
+                if (count > 0) squares[x][y] = 4 + count;
+            }
+        }
+    }
+
+	// 3, 1
+	// 3, 5
+	// 3, 7
+	// 4, 4
+	// 7, 2
+	// 7, 5
+	// 8, 1
+	// 8, 6
+	// 8, 7
+}
+
+newGame();
+
+</script>
 
 </script>
 
