@@ -4,26 +4,136 @@
 <head>
 <title>JavaScript Minesweeper</title>
 <meta charset="utf-8" />
+<style>
+body, div, p, ul, ol, li {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: black;
+	font-family: Tahoma, sans-serif;
+	font-size: 10px;
+	line-height: 12px;
+}
+
+div {
+	margin: 10px auto;
+	text-align: left;
+}
+
+div#gamemenu {
+	background: #d0d1cc;
+	margin: 0px auto;
+}
+
+div ul ul {
+	display: none;
+}
+
+div ul li:hover > ul {
+	display: block;
+}
+
+div ul {
+	padding: 0 0;
+	list-style: none;
+	position: relative;
+	display: inline-table;
+}
+div ul:after {
+	clear: both;
+	content: "";
+	display: block;
+}
+
+div ul li {
+	float: left;
+}
+
+div ul li:hover {
+	background: #d0d1cc;
+}
+
+div ul li:hover a {
+	color: #000;
+}
+
+div ul li a {
+	display: block;
+	padding: 5px 10px;
+	color: #000;
+	text-align: left;
+	text-decoration: none;
+}
+
+div ul ul {
+	background: #d0d1cc;
+	border-radius: 0px;
+	box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+	padding: 0;
+	position: absolute;
+	top: 100%;
+}
+
+div ul ul li {
+	float: none;
+}
+
+div ul ul li a {
+	padding: 3px 20px;
+	color: #000;
+}
+
+div ul ul li a:hover {
+	background: #0a246a;
+	color: white;
+}
+</style>
 </head>
 
-<body style="background-color:black;">
+<body>
 
-<!-- height is 256 for the game board and 33 for the counters -->
-<div style="width:480px;height:289px;margin-left:auto;margin-right:auto;">
-<canvas id="canvas" style="border:1px solid black;" width="480" height="289">It appears that your browser doesn't support the canvas element.</canvas>
+<div id="gamemenu" style="width:144px;margin-left:auto;margin-right:auto;">
+	<ul>
+		<li><a href="#"><u>G</u>ame</a>
+			<ul>
+				<li><a href="Javascript:newGame(CURRENTGAME);"><u>N</u>ew</a></li>
+				<li><hr width="90%" /></li>
+				<li><a href="Javascript:newGame(10);"><u>B</u>eginner</a></li>
+				<li><a href="Javascript:newGame(40);"><u>I</u>ntermediate</a></li>
+				<li><a href="Javascript:newGame(99);"><u>E</u>xpert</a></li>
+<!--			<li><a href="#"><u>C</u>ustom...</a></li>
+				<li><hr width="90%" /></li>
+				<li><a href="#"><u>M</u>arks (?)</a></li>
+				<li><a href="#">Co<u>l</u>or</a></li>
+				<li><a href="#"><u>S</u>ound</a></li>
+				<li><hr width="90%" /></li>
+				<li><a href="#">Best&nbsp;<u>T</u>imes...</a></li> -->
+			</ul>
+		</li>
+<!--	<li><a href="#"><u>H</u>elp</a>
+			<ul>
+				<li><a href="#"><u>C</u>ontents</a></li>
+				<li><a href="#"><u>S</u>earch&nbsp;for&nbsp;Help&nbsp;on...</a></li>
+				<li><a href="#">Using&nbsp;<u>H</u>elp</a></li>
+				<li><hr /></li>
+				<li><a href="#"><u>A</u>bout&nbsp;Minesweeper...</a></li>
+			</ul>
+		</li> -->
+	</ul>
 </div>
 
-<br />
-<br />
+<!--
+// B:  9 ×  9 field with 10 mines and 144 x 144 grid
+// I: 16 × 16 field with 40 mines and 256 x 256 grid
+// E: 30 × 16 field with 99 mines and 480 x 256 grid
+-->
 
-<div style="width:144px;margin-left:auto;margin-right:auto;">
-<input style="width:144px;" type="button" onclick="Javascript:newGame()" value="New Game" />
-</div>
-
-<br />
-
-<div id=output style="width:144px;height:144px;margin-left:auto;margin-right:auto;">
-&nbsp;
+<!-- height is 144 for the game board and 33 for the counters -->
+<div id="field" style="width:144px;height:177px;margin-left:auto;margin-right:auto;color:white;font-family:sans-serif;">
+<canvas id="canvas" style="border:1px solid black;" width="144" height="177">It appears that your browser doesn't support the canvas element. :(<br /><br />Please try a modern browser like <a href="http://www.google.com/chrome">Google Chrome</a> or <a href="http://mozilla.com/">Mozilla Firefox</a>.</canvas>
 </div>
 
 <script>
@@ -32,19 +142,17 @@
 
 var x, y;
 
-// Beginner: 8 × 8 or 9 × 9 field with 10 mines
-// Intermediate: 16 × 16 field with 40 mines
-// Expert: 30 × 16 field with 99 mines
+// B:  9 ×  9 field with 10 mines and 144 x 144 grid
+// I: 16 × 16 field with 40 mines and 256 x 256 grid
+// E: 30 × 16 field with 99 mines and 480 x 256 grid
 
-// 144 x 144
-// 256 x 256
-// 480 x 256
+var FIELDWIDTH = 9;
+var FIELDHEIGHT = 9;
+var NUMBEROFBOMBS = 10;
+var CANVASWIDTH = 16 * FIELDWIDTH;
+var CANVASHEIGHT = 16 * FIELDHEIGHT;
 
-var FIELDWIDTH = 30;
-var FIELDHEIGHT = 16;
-var NUMBEROFBOMBS = 99;
-var CANVASWIDTH = 480;
-var CANVASHEIGHT = 256;
+var CURRENTGAME = 9;
 
 var HIDDEN = 0;
 var EMPTY = 1;
@@ -100,20 +208,19 @@ var canvas;
 var context;
 var sprite;
 function drawField() {
-	document.getElementById('output').style.color = 'white';
 	var status = '';
 
 	// Draw background for counters
-    context.drawImage(sprite, 5, 5, 6, 6, 0, 0, 480, 33);
+    context.drawImage(sprite, 5, 5, 6, 6, 0, 0, CANVASWIDTH, 33);
 
 	// Draw housings for counters
 	context.drawImage(sprite, 0, 39, 41, 25,   5, 4, 41, 25);
-	context.drawImage(sprite, 0, 39, 41, 25, 434, 4, 41, 25);
+	context.drawImage(sprite, 0, 39, 41, 25, CANVASWIDTH-46, 4, 41, 25);
 
 	if (gameover) {
-		context.drawImage(sprite, 68, 39, 27, 27, 227, 2, 27, 27);
+		context.drawImage(sprite, 68, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
 	} else {
-		context.drawImage(sprite, 41, 39, 27, 27, 227, 2, 27, 27);
+		context.drawImage(sprite, 41, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
 	}
 
     for (x = 0; x < FIELDWIDTH; x += 1) {
@@ -155,21 +262,21 @@ function drawField() {
     }
    	strlen = strSeconds.length;
 	if (strlen === 3) {
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, 435, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, 448, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[2]))*13, 16, 13, 23, 461, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-45, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-32, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[2]))*13, 16, 13, 23, CANVASWIDTH-19, 5, 13, 23);
 	} else if (strlen === 2) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, 435, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, 448, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, 461, 5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-45, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-32, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-19, 5, 13, 23);
 	} else if (strlen === 1) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, 435, 5, 13, 23);
-		context.drawImage(sprite, 0*13, 16, 13, 23, 448, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, 461, 5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-45, 5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-32, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-19, 5, 13, 23);
 	}
 
 	if(bombsIdentified === NUMBEROFBOMBS) {
-		context.drawImage(sprite, 95, 39, 27, 27, 227, 2, 27, 27);
+		context.drawImage(sprite, 95, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
 		alert('Yay!. You won in ' + seconds + ' seconds!');
 		clearInterval(tmr);
 	}
@@ -178,6 +285,7 @@ function drawField() {
 function userMousedDown(evt) {
     var clickX, clickY;
 	evt.preventDefault();
+
 	if (!gameover) {
 		clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
 		clickY = Math.floor(((evt.pageY - canvas.offsetTop) - 33) / 16); // subtracting 33 for the counters
@@ -203,7 +311,7 @@ function checkForAdjacentBlanks(andy, bob) {
 		}
 		if(squares[r][s - 1] === EMPTY || squares[r][s - 1] > 4) {
 			guesses[r][s - 1] = GUESSED;
-		//	checkForAdjacentBlanks(r, s - 1);
+//			checkForAdjacentBlanks(r, s - 1);
 		}
 		if (r < FIELDWIDTH-1) {
 			if(squares[r + 1][s - 1] === EMPTY || squares[r + 1][s - 1] > 4) {
@@ -212,22 +320,26 @@ function checkForAdjacentBlanks(andy, bob) {
 			}
 		}
 	}
+
 	if (r > 0) {
 		if(squares[r - 1][s] === EMPTY || squares[r - 1][s] > 4) {
 			guesses[r - 1][s] = GUESSED;
-		//	checkForAdjacentBlanks(r - 1, s);
+//			checkForAdjacentBlanks(r - 1, s);
 		}
 	}
+
 	if(squares[r][s] === EMPTY || squares[r][s] > 4) {
 		guesses[r][s] = GUESSED;
 //		checkForAdjacentBlanks(r, s);
 	}
+
 	if (r < FIELDWIDTH-1) {
 		if(squares[r + 1][s] === EMPTY || squares[r + 1][s] > 4) {
 			guesses[r + 1][s] = GUESSED;
-		//	checkForAdjacentBlanks(r + 1, s);
+//			checkForAdjacentBlanks(r + 1, s);
 		}
 	}
+
 	if(s < FIELDHEIGHT-1) {
 		if (r > 0) {
 			if(squares[r - 1][s + 1] === EMPTY || squares[r - 1][s + 1] > 4) {
@@ -237,7 +349,7 @@ function checkForAdjacentBlanks(andy, bob) {
 		}
 		if(squares[r][s + 1] === EMPTY || squares[r][s + 1] > 4) {
 			guesses[r][s + 1] = GUESSED;
-		//	checkForAdjacentBlanks(r, s + 1);
+//			checkForAdjacentBlanks(r, s + 1);
 		}
 		if (r < FIELDWIDTH-1) {
 			if(squares[r + 1][s + 1] === EMPTY || squares[r + 1][s + 1] > 4) {
@@ -280,8 +392,8 @@ function userMousedUp(evt) {
 		}
 	// If left-click
 	} else {
-		if ((evt.pageX - canvas.offsetLeft) > 228 && (evt.pageX - canvas.offsetLeft) < 254 && (evt.pageY - canvas.offsetTop) > 3 && (evt.pageY - canvas.offsetTop) < 29 ) {
-			newGame();
+		if ((evt.pageX - canvas.offsetLeft) > (CANVASWIDTH/2)-13 && (evt.pageX - canvas.offsetLeft) < (CANVASWIDTH/2)+13 && (evt.pageY - canvas.offsetTop) > 3 && (evt.pageY - canvas.offsetTop) < 29 ) {
+			newGame(CURRENTGAME);
 		} else if (squares[clickX][clickY] === BOMB) {
 			for (x = 0; x < FIELDWIDTH; x += 1) {
 				for (y = 0; y < FIELDHEIGHT; y += 1) {
@@ -310,11 +422,14 @@ function userRightClicked(evt) {
 
 function userKeyUp(evt) {
 	if (evt.keyCode == 78 ) {
-		newGame();
+		newGame(CURRENTGAME);
 	}
 }
 
-function newGame() {
+// B:  9 ×  9 field with 10 mines and 144 x 144 grid
+// I: 16 × 16 field with 40 mines and 256 x 256 grid
+// E: 30 × 16 field with 99 mines and 480 x 256 grid
+function newGame(size) {
 	gameover = 0;
 	bombsIdentified = 0;
 	seconds = 0;
@@ -325,10 +440,37 @@ function newGame() {
 	resetGuesses();
 
     canvas = document.getElementById('canvas');
+	if (size === 40) {
+		FIELDWIDTH = 16;
+		FIELDHEIGHT = 16;
+		CURRENTGAME = NUMBEROFBOMBS = 40;
+	} else if (size === 99) {
+		FIELDWIDTH = 30;
+		FIELDHEIGHT = 16;
+		CURRENTGAME = NUMBEROFBOMBS = 99;
+	} else {
+		FIELDWIDTH = 9;
+		FIELDHEIGHT = 9;
+		CURRENTGAME = NUMBEROFBOMBS = 10;
+	}
+	CANVASWIDTH = 16 * FIELDWIDTH;
+	CANVASHEIGHT = (16 * FIELDHEIGHT) + 33;
+
+	document.getElementById('gamemenu').width = CANVASWIDTH;
+	document.getElementById('field').width = CANVASWIDTH;
+	document.getElementById('field').height = CANVASHEIGHT;
+
+	canvas.width = CANVASWIDTH;
+	canvas.height = CANVASHEIGHT;
     context = canvas.getContext('2d');
 
+	squares = new Array(FIELDWIDTH);
+	for (x = 0; x < FIELDWIDTH; x += 1) {
+		squares[x] = new Array(FIELDHEIGHT);
+	}
+	resetGuesses();
+
     canvas.addEventListener("contextmenu", userRightClicked, false);
-    canvas.addEventListener("longpress", userRightClicked, false);
     canvas.addEventListener("mousedown", userMousedDown, false);
     canvas.addEventListener("mouseup", userMousedUp, false);
     window.addEventListener("keyup", userKeyUp, false);
