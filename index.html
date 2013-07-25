@@ -28,39 +28,39 @@ div#menubar {
 	margin: 0px auto;
 }
 
-div ul ul {
+div#menubar ul ul {
 	display: none;
 }
 
-div ul li:hover > ul {
+div#menubar ul li:hover > ul {
 	display: block;
 }
 
-div ul {
+div#menubar ul {
 	padding: 0 0;
 	list-style: none;
 	position: relative;
 	display: inline-table;
 }
-div ul:after {
+div#menubar ul:after {
 	clear: both;
 	content: "";
 	display: block;
 }
 
-div ul li {
+div#menubar ul li {
 	float: left;
 }
 
-div ul li:hover {
+div#menubar ul li:hover {
 	background: #d0d1cc;
 }
 
-div ul li:hover a {
+div#menubar ul li:hover a {
 	color: #000;
 }
 
-div ul li a {
+div#menubar ul li a {
 	display: block;
 	padding: 5px 10px;
 	color: #000;
@@ -68,7 +68,7 @@ div ul li a {
 	text-decoration: none;
 }
 
-div ul ul {
+div#menubar ul ul {
 	background: #d0d1cc;
 	border-radius: 0px;
 	box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
@@ -77,16 +77,16 @@ div ul ul {
 	top: 100%;
 }
 
-div ul ul li {
+div#menubar ul ul li {
 	float: none;
 }
 
-div ul ul li a {
+div#menubar ul ul li a {
 	padding: 3px 20px;
 	color: #000;
 }
 
-div ul ul li a:hover {
+div#menubar ul ul li a:hover {
 	background: #0a246a;
 	color: white;
 }
@@ -134,6 +134,14 @@ div ul ul li a:hover {
 <!-- height is 144 for the game board and 33 for the counters -->
 <div id="field" style="width:144px;height:177px;margin-left:auto;margin-right:auto;color:white;font-family:sans-serif;">
 <canvas id="canvas" style="border:1px solid black;" width="144" height="177">It appears that your browser doesn't support the canvas element. :(<br /><br />Please try a modern browser like <a href="http://www.google.com/chrome">Google Chrome</a> or <a href="http://mozilla.com/">Mozilla Firefox</a>.</canvas>
+</div>
+
+<div style="width:800px;margin-left:auto;margin-right:auto;color:white;">
+<h3>TODO</h3>
+<ul>
+<li>Touch controls for iPhone, iPad, other devices</li>
+<li>Scoreboard</li>
+</ul>
 </div>
 
 <script>
