@@ -23,7 +23,7 @@ div {
 	text-align: left;
 }
 
-div#gamemenu {
+div#menubar {
 	background: #d0d1cc;
 	margin: 0px auto;
 }
@@ -95,12 +95,12 @@ div ul ul li a:hover {
 
 <body>
 
-<div id="gamemenu" style="width:144px;margin-left:auto;margin-right:auto;">
+<div id="menubar" style="width:144px;margin-left:auto;margin-right:auto;">
 	<ul>
-		<li><a href="#"><u>G</u>ame</a>
+		<li><a href="#">Game</a>
 			<ul>
 				<li><a href="Javascript:newGame(CURRENTGAME);"><u>N</u>ew</a></li>
-				<li><hr width="90%" /></li>
+				<li><hr style="width:90%" /></li>
 				<li><a href="Javascript:newGame(10);"><u>B</u>eginner</a></li>
 				<li><a href="Javascript:newGame(40);"><u>I</u>ntermediate</a></li>
 				<li><a href="Javascript:newGame(99);"><u>E</u>xpert</a></li>
@@ -175,6 +175,14 @@ var GUESSED = 1;
 var FLAGGED = 2;
 var MOUSEDOWN = 3;
 var guesses;
+var bombsIdentified = 0;
+var gamestart = 0;
+var gameover = 0;
+var seconds = 0;
+var tmr = 0;
+var mousebtnheld = 0;
+
+var clickX, clickY;
 
 function resetGuesses() {
 	guesses = new Array(FIELDWIDTH);
@@ -185,12 +193,6 @@ function resetGuesses() {
 		}
 	}
 }
-
-var bombsIdentified = 0;
-var gamestart = 0;
-var gameover = 0;
-var seconds = 0;
-var tmr = 0;
 
 var i, j;
 function isBomb(i, j) {
@@ -274,34 +276,10 @@ function drawField() {
 		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-32, 5, 13, 23);
 		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-19, 5, 13, 23);
 	}
-
-	if(bombsIdentified === NUMBEROFBOMBS) {
-		context.drawImage(sprite, 95, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
-		alert('Yay!. You won in ' + seconds + ' seconds!');
-		clearInterval(tmr);
-	}
 }
 
-function userMousedDown(evt) {
-    var clickX, clickY;
-	evt.preventDefault();
-
-	if (!gameover) {
-		clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
-		clickY = Math.floor(((evt.pageY - canvas.offsetTop) - 33) / 16); // subtracting 33 for the counters
-		if (guesses[clickX][clickY] === NOTGUESSED) {
-			guesses[clickX][clickY] = MOUSEDOWN;
-		}
-	}
-    drawField();
-}
-
-function checkForAdjacentBlanks(andy, bob) {
-//	alert(andy + ', ' + bob);
+function checkForAdjacentBlanks(r, s) {
 	var retVal = 0;
-	var r, s;
-	r = andy;
-	s = bob;
 	if(s > 0) {
 		if (r > 0) {
 			if(squares[r - 1][s - 1] === EMPTY || squares[r - 1][s - 1] > 4) {
@@ -365,52 +343,99 @@ function clock() {
     drawField();
 }
 
+function userMousedOut(evt) {
+	if (!gameover && mousebtnheld) {
+		guesses[clickX][clickY] = NOTGUESSED;
+		mousebtnheld = 0;
+	}
+	drawfield();
+}
+
+function userMousedDown(evt) {
+	evt.preventDefault();
+
+	clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
+	clickY = Math.floor(((evt.pageY - canvas.offsetTop) - 33) / 16); // subtracting 33 for the counters
+
+	if (!gameover) {
+		if (guesses[clickX][clickY] === NOTGUESSED) {
+			guesses[clickX][clickY] = MOUSEDOWN;
+		}
+		mousebtnheld = 1;
+	}
+    drawField();
+}
+
 function userMousedUp(evt) {
 	evt.preventDefault();
-    var clickX, clickY;
-    clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
-    clickY = Math.floor(((evt.pageY - canvas.offsetTop) - 33) / 16); // subtracting 33 for the counters
 
-	if (gamestart === 0) {
-		gamestart = 1;
-		tmr = setInterval(function(){clock()},1000);
-	}
+	mousebtnheld = 0;
 
-    // If right-click
-	if (evt.button === 2) {
-		// Don't let the player make changes when the game is over
+	// If mouse has been moved to a new square, release previous square and do nothing
+	if ((clickX != Math.floor((evt.pageX - canvas.offsetLeft) / 16)) ||
+		(clickY != Math.floor(((evt.pageY - canvas.offsetTop) - 33) / 16))) { // subtracting 33 for the counters
 		if (!gameover) {
-			if (guesses[clickX][clickY] == FLAGGED) {
-				guesses[clickX][clickY] = NOTGUESSED;
-				bombsIdentified -= 1;
-			} else if (guesses[clickX][clickY] === GUESSED) {
-				// Do nothing to square that have already been cleared
-			} else {
-				guesses[clickX][clickY] = FLAGGED;
-				bombsIdentified += 1;
-			}
+			guesses[clickX][clickY] = NOTGUESSED;
 		}
-	// If left-click
 	} else {
-		if ((evt.pageX - canvas.offsetLeft) > (CANVASWIDTH/2)-13 && (evt.pageX - canvas.offsetLeft) < (CANVASWIDTH/2)+13 && (evt.pageY - canvas.offsetTop) > 3 && (evt.pageY - canvas.offsetTop) < 29 ) {
-			newGame(CURRENTGAME);
-		} else if (squares[clickX][clickY] === BOMB) {
-			for (x = 0; x < FIELDWIDTH; x += 1) {
-				for (y = 0; y < FIELDHEIGHT; y += 1) {
-					guesses[x][y] = GUESSED;
+		// If this is the first move, start the timer
+		if (gamestart === 0) {
+			gamestart = 1;
+			tmr = setInterval(function(){clock()},1000);
+		}
+
+		// If right-click
+		if (evt.button === 2) {
+			// Only let the player make changes when the game is still going
+			if (!gameover) {
+				if (guesses[clickX][clickY] == FLAGGED) {
+					guesses[clickX][clickY] = NOTGUESSED;
+					bombsIdentified -= 1;
+				} else if (guesses[clickX][clickY] === GUESSED) {
+					// Do nothing to square that have already been cleared
+				} else {
+					guesses[clickX][clickY] = FLAGGED;
+					bombsIdentified += 1;
 				}
 			}
-			squares[clickX][clickY] === EXPLODED;
-			gameover = 1;
-			clearInterval(tmr);
+		// If left-click
 		} else {
-			// if game isn't over and
-			// square is currently hidden
-			if (!gameover && guesses[clickX][clickY] !== GUESSED) {
-				guesses[clickX][clickY] = GUESSED;
-				// TODO Check for adjacent blanks
-				checkForAdjacentBlanks(clickX, clickY);
+			if ((evt.pageX - canvas.offsetLeft) > (CANVASWIDTH/2)-13 && (evt.pageX - canvas.offsetLeft) < (CANVASWIDTH/2)+13 && (evt.pageY - canvas.offsetTop) > 3 && (evt.pageY - canvas.offsetTop) < 29 ) {
+				newGame(CURRENTGAME);
+			} else if (squares[clickX][clickY] === BOMB) {
+				for (x = 0; x < FIELDWIDTH; x += 1) {
+					for (y = 0; y < FIELDHEIGHT; y += 1) {
+						guesses[x][y] = GUESSED;
+					}
+				}
+				squares[clickX][clickY] === EXPLODED;
+				gameover = 1;
+				clearInterval(tmr);
+			} else {
+				// if game isn't over and
+				// square is currently hidden
+				if (!gameover && guesses[clickX][clickY] !== GUESSED) {
+					guesses[clickX][clickY] = GUESSED;
+					// TODO Check for adjacent blanks
+					checkForAdjacentBlanks(clickX, clickY);
+				}
 			}
+		}
+
+		if(bombsIdentified === NUMBEROFBOMBS) {
+			context.drawImage(sprite, 95, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
+			alert('Yay!. You won in ' + seconds + ' seconds!');
+			clearInterval(tmr);
+
+			// Clear remaining hidden squares
+			for (x = 0; x < FIELDWIDTH; x += 1) {
+				for (y = 0; y < FIELDHEIGHT; y += 1) {
+					if (guesses[x][y] === NOTGUESSED) {
+						guesses[x][y] = GUESSED;
+					}
+				}
+			}
+
 		}
 	}
     drawField();
@@ -421,7 +446,13 @@ function userRightClicked(evt) {
 }
 
 function userKeyUp(evt) {
-	if (evt.keyCode == 78 ) {
+	if (evt.keyCode == 66 ) { // beginner
+		newGame(10);
+	} else if (evt.keyCode == 69 ) { // expert
+		newGame(99);
+	} else if (evt.keyCode == 73 ) { // intermediate
+		newGame(40);
+	} else if (evt.keyCode == 78 ) { // new
 		newGame(CURRENTGAME);
 	}
 }
@@ -436,8 +467,6 @@ function newGame(size) {
 	if(tmr)
 		clearInterval(tmr);
 	gamestart = 0;
-
-	resetGuesses();
 
     canvas = document.getElementById('canvas');
 	if (size === 40) {
@@ -456,7 +485,7 @@ function newGame(size) {
 	CANVASWIDTH = 16 * FIELDWIDTH;
 	CANVASHEIGHT = (16 * FIELDHEIGHT) + 33;
 
-	document.getElementById('gamemenu').width = CANVASWIDTH;
+	document.getElementById('menubar').width = CANVASWIDTH;
 	document.getElementById('field').width = CANVASWIDTH;
 	document.getElementById('field').height = CANVASHEIGHT;
 
@@ -472,6 +501,7 @@ function newGame(size) {
 
     canvas.addEventListener("contextmenu", userRightClicked, false);
     canvas.addEventListener("mousedown", userMousedDown, false);
+    canvas.addEventListener("mouseout", userMousedOut, false);
     canvas.addEventListener("mouseup", userMousedUp, false);
     window.addEventListener("keyup", userKeyUp, false);
 
