@@ -174,7 +174,7 @@ var NOTGUESSED = 0;
 var GUESSED = 1;
 var FLAGGED = 2;
 var MOUSEDOWN = 3;
-var guesses;
+var guesses;				// array that holds players changes to board
 var bombsIdentified = 0;
 var gamestart = 0;
 var gameover = 0;
@@ -190,6 +190,20 @@ function resetGuesses() {
 		guesses[x] = new Array(FIELDHEIGHT);
 		for (y = 0; y < FIELDHEIGHT; y += 1) {
 			guesses[x][y] = NOTGUESSED;
+		}
+	}
+}
+
+var checks;					// array that holds whether square has been checked this turn
+var NOTCHECKED = 0;
+var CHECKED = 1;
+
+function resetChecks() {
+	checks = new Array(FIELDWIDTH);
+	for (x = 0; x < FIELDWIDTH; x += 1) {
+		checks[x] = new Array(FIELDHEIGHT);
+		for (y = 0; y < FIELDHEIGHT; y += 1) {
+			checks[x][y] = NOTCHECKED;
 		}
 	}
 }
@@ -278,23 +292,40 @@ function drawField() {
 	}
 }
 
+var nest = 0;
 function checkForAdjacentBlanks(r, s) {
+	nest += 1;
 	var retVal = 0;
 	if(s > 0) {
 		if (r > 0) {
 			if(squares[r - 1][s - 1] === EMPTY || squares[r - 1][s - 1] > 4) {
 				guesses[r - 1][s - 1] = GUESSED;
-		//		checkForAdjacentBlanks(r - 1, s - 1);
+				if (checks[r - 1][s - 1] === NOTCHECKED) {
+					checks[r - 1][s - 1] = CHECKED;
+					if(squares[r - 1][s - 1] === EMPTY) {
+						checkForAdjacentBlanks(r - 1, s - 1);
+					}
+				}
 			}
 		}
 		if(squares[r][s - 1] === EMPTY || squares[r][s - 1] > 4) {
-			guesses[r][s - 1] = GUESSED;
-//			checkForAdjacentBlanks(r, s - 1);
+			if (checks[r][s - 1] === NOTCHECKED) {
+				checks[r][s - 1] = CHECKED;
+				guesses[r][s - 1] = GUESSED;
+				if(squares[r][s - 1] === EMPTY) {
+					checkForAdjacentBlanks(r, s - 1);
+				}
+			}
 		}
 		if (r < FIELDWIDTH-1) {
 			if(squares[r + 1][s - 1] === EMPTY || squares[r + 1][s - 1] > 4) {
 				guesses[r + 1][s - 1] = GUESSED;
-		//		checkForAdjacentBlanks(r + 1, s - 1);
+				if (checks[r + 1][s - 1] === NOTCHECKED) {
+					checks[r + 1][s - 1] = CHECKED;
+					if(squares[r + 1][s - 1] === EMPTY) {
+						checkForAdjacentBlanks(r + 1, s - 1);
+					}
+				}
 			}
 		}
 	}
@@ -302,19 +333,31 @@ function checkForAdjacentBlanks(r, s) {
 	if (r > 0) {
 		if(squares[r - 1][s] === EMPTY || squares[r - 1][s] > 4) {
 			guesses[r - 1][s] = GUESSED;
-//			checkForAdjacentBlanks(r - 1, s);
+			if (checks[r - 1][s] === NOTCHECKED) {
+				checks[r - 1][s] = CHECKED;
+				if(squares[r - 1][s] === EMPTY) {
+					checkForAdjacentBlanks(r - 1, s);
+				}
+			}
 		}
 	}
 
 	if(squares[r][s] === EMPTY || squares[r][s] > 4) {
 		guesses[r][s] = GUESSED;
-//		checkForAdjacentBlanks(r, s);
+		if (checks[r][s] === NOTCHECKED) {
+			checks[r][s] = CHECKED;
+		}
 	}
 
 	if (r < FIELDWIDTH-1) {
 		if(squares[r + 1][s] === EMPTY || squares[r + 1][s] > 4) {
 			guesses[r + 1][s] = GUESSED;
-//			checkForAdjacentBlanks(r + 1, s);
+			if (checks[r + 1][s] === NOTCHECKED) {
+				checks[r + 1][s] = CHECKED;
+				if(squares[r + 1][s] === EMPTY) {
+					checkForAdjacentBlanks(r + 1, s);
+				}
+			}
 		}
 	}
 
@@ -322,17 +365,32 @@ function checkForAdjacentBlanks(r, s) {
 		if (r > 0) {
 			if(squares[r - 1][s + 1] === EMPTY || squares[r - 1][s + 1] > 4) {
 				guesses[r - 1][s + 1] = GUESSED;
-		//		checkForAdjacentBlanks(r - 1, s + 1);
+				if (checks[r - 1][s + 1] === NOTCHECKED) {
+					checks[r - 1][s + 1] = CHECKED;
+					if(squares[r - 1][s + 1] === EMPTY) {
+						checkForAdjacentBlanks(r - 1, s + 1);
+					}
+				}
 			}
 		}
 		if(squares[r][s + 1] === EMPTY || squares[r][s + 1] > 4) {
 			guesses[r][s + 1] = GUESSED;
-//			checkForAdjacentBlanks(r, s + 1);
+			if (checks[r][s + 1] === NOTCHECKED) {
+				checks[r][s + 1] = CHECKED;
+				if(squares[r][s + 1] === EMPTY) {
+					checkForAdjacentBlanks(r, s + 1);
+				}
+			}
 		}
 		if (r < FIELDWIDTH-1) {
 			if(squares[r + 1][s + 1] === EMPTY || squares[r + 1][s + 1] > 4) {
 				guesses[r + 1][s + 1] = GUESSED;
-		//		checkForAdjacentBlanks(r + 1, s + 1);
+				if (checks[r + 1][s + 1] === NOTCHECKED) {
+					checks[r + 1][s + 1] = CHECKED;
+					if(squares[r + 1][s + 1] === EMPTY) {
+						checkForAdjacentBlanks(r + 1, s + 1);
+					}
+				}
 			}
 		}
 	}
@@ -348,7 +406,7 @@ function userMousedOut(evt) {
 		guesses[clickX][clickY] = NOTGUESSED;
 		mousebtnheld = 0;
 	}
-	drawfield();
+	drawField();
 }
 
 function userMousedDown(evt) {
@@ -392,7 +450,7 @@ function userMousedUp(evt) {
 					guesses[clickX][clickY] = NOTGUESSED;
 					bombsIdentified -= 1;
 				} else if (guesses[clickX][clickY] === GUESSED) {
-					// Do nothing to square that have already been cleared
+					// Do nothing to squares that have already been cleared
 				} else {
 					guesses[clickX][clickY] = FLAGGED;
 					bombsIdentified += 1;
@@ -408,7 +466,7 @@ function userMousedUp(evt) {
 						guesses[x][y] = GUESSED;
 					}
 				}
-				squares[clickX][clickY] === EXPLODED;
+				squares[clickX][clickY] = EXPLODED;
 				gameover = 1;
 				clearInterval(tmr);
 			} else {
@@ -416,8 +474,10 @@ function userMousedUp(evt) {
 				// square is currently hidden
 				if (!gameover && guesses[clickX][clickY] !== GUESSED) {
 					guesses[clickX][clickY] = GUESSED;
-					// TODO Check for adjacent blanks
-					checkForAdjacentBlanks(clickX, clickY);
+					// Check for adjacent blanks is clicked square is empty
+					if(squares[clickX][clickY] === EMPTY) {
+						checkForAdjacentBlanks(clickX, clickY);
+					}
 				}
 			}
 		}
@@ -498,6 +558,8 @@ function newGame(size) {
 		squares[x] = new Array(FIELDHEIGHT);
 	}
 	resetGuesses();
+
+	resetChecks();
 
     canvas.addEventListener("contextmenu", userRightClicked, false);
     canvas.addEventListener("mousedown", userMousedDown, false);
