@@ -19,12 +19,12 @@ body {
 }
 
 div {
-	margin: 10px auto;
+	margin: 0px auto;
 	text-align: left;
 }
 
 div#menubar {
-	background: #d0d1cc;
+	background: #d4d0c8;
 	margin: 0px auto;
 }
 
@@ -53,7 +53,7 @@ div#menubar ul li {
 }
 
 div#menubar ul li:hover {
-	background: #d0d1cc;
+	background: #d4d0c8;
 }
 
 div#menubar ul li:hover a {
@@ -69,7 +69,7 @@ div#menubar ul li a {
 }
 
 div#menubar ul ul {
-	background: #d0d1cc;
+	background: #d4d0c8;
 	border-radius: 0px;
 	box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
 	padding: 0;
@@ -95,10 +95,11 @@ div#menubar ul ul li a:hover {
 
 <body>
 
-<div id="menubar" style="width:144px;margin-left:auto;margin-right:auto;">
+<!-- menubar is 26 pixels wider than game board -->
+<div id="menubar" style="width:160px;margin-left:auto;margin-right:auto;">
 	<ul>
-		<li><a href="#">Game</a>
-			<ul>
+		<li><a href="#"><u>G</u>ame</a>
+			<ul id="gamemenu">
 				<li><a href="Javascript:newGame(CURRENTGAME);"><u>N</u>ew</a></li>
 				<li><hr style="width:90%" /></li>
 				<li><a href="Javascript:newGame(10);"><u>B</u>eginner</a></li>
@@ -132,11 +133,18 @@ div#menubar ul ul li a:hover {
 -->
 
 <!-- height is 144 for the game board and 33 for the counters -->
-<div id="field" style="width:144px;height:177px;margin-left:auto;margin-right:auto;color:white;font-family:sans-serif;">
-<canvas id="canvas" style="border:1px solid black;" width="144" height="177">It appears that your browser doesn't support the canvas element. :(<br /><br />Please try a modern browser like <a href="http://www.google.com/chrome">Google Chrome</a> or <a href="http://mozilla.com/">Mozilla Firefox</a>.</canvas>
+<div id="field" style="width:146px;height:179px;margin-left:auto;margin-right:auto;background-color:#d4d0c8;font-family:sans-serif;">
+<canvas id="canvas" style="border:0px solid black;" width="146" height="179">It appears that your browser doesn't support the canvas element. :(<br /><br />Please try a modern browser like <a href="http://www.google.com/chrome">Google Chrome</a> or <a href="http://mozilla.com/">Mozilla Firefox</a>.</canvas>
 </div>
 
-<div style="width:800px;margin-left:auto;margin-right:auto;color:white;">
+<div style="width:300px;margin-left:auto;margin-right:auto;color:white;">
+<h3>SHORTCUTS</h3>
+<ul>
+<li><b>N</b> - New Game</li>
+<li><b>B</b> - New Beginner Game</li>
+<li><b>I</b> - New Intermediate Game</li>
+<li><b>E</b> - New Expert Game</li>
+</ul>
 <h3>TODO</h3>
 <ul>
 <li>Touch controls for iPhone, iPad, other devices</li>
@@ -157,8 +165,10 @@ var x, y;
 var FIELDWIDTH = 9;
 var FIELDHEIGHT = 9;
 var NUMBEROFBOMBS = 10;
-var CANVASWIDTH = 16 * FIELDWIDTH;
-var CANVASHEIGHT = 16 * FIELDHEIGHT;
+var SCOREHEIGHT = 33;
+var WINDOWBORDER = 11;
+var CANVASWIDTH = (16 * FIELDWIDTH) + (WINDOWBORDER*2);
+var CANVASHEIGHT = (16 * FIELDHEIGHT) + (WINDOWBORDER*2);
 
 var CURRENTGAME = 9;
 
@@ -184,11 +194,15 @@ var FLAGGED = 2;
 var MOUSEDOWN = 3;
 var guesses;				// array that holds players changes to board
 var bombsIdentified = 0;
-var gamestart = 0;
-var gameover = 0;
 var seconds = 0;
 var tmr = 0;
 var mousebtnheld = 0;
+
+var GAMESTATUS = 0;
+var NOGAME = 0;
+var GAMEPLAYING = 1;
+var GAMELOST = 2;
+var GAMEWON = 3;
 
 var clickX, clickY;
 
@@ -234,50 +248,52 @@ var sprite;
 function drawField() {
 	var status = '';
 
-	// Draw background for counters
-    context.drawImage(sprite, 5, 5, 6, 6, 0, 0, CANVASWIDTH, 33);
+	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
 
-	// Draw housings for counters
-	context.drawImage(sprite, 0, 39, 41, 25,   5, 4, 41, 25);
-	context.drawImage(sprite, 0, 39, 41, 25, CANVASWIDTH-46, 4, 41, 25);
+	// Draw top border
+    context.drawImage(sprite, 176, 0,            WINDOWBORDER, WINDOWBORDER, 0,                          0,                            WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 187, 0,            1,            WINDOWBORDER, WINDOWBORDER,               0,                            CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
+    context.drawImage(sprite, 190, 0,            WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, 0,                            WINDOWBORDER,                     WINDOWBORDER);
+	// Draw scoreheader sides
+    context.drawImage(sprite, 176, WINDOWBORDER, WINDOWBORDER, 1,            0,                          WINDOWBORDER,                 WINDOWBORDER,                     SCOREHEIGHT);
+    context.drawImage(sprite, 190, WINDOWBORDER, WINDOWBORDER, 1,            CANVASWIDTH - WINDOWBORDER, WINDOWBORDER,                 WINDOWBORDER,                     SCOREHEIGHT);
+	// Draw middle border
+    context.drawImage(sprite, 176, WINDOWBORDER, WINDOWBORDER, WINDOWBORDER, 0,                          WINDOWBORDER+SCOREHEIGHT,     WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 187, WINDOWBORDER, 1,            WINDOWBORDER, WINDOWBORDER,               WINDOWBORDER+SCOREHEIGHT,     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
+    context.drawImage(sprite, 190, WINDOWBORDER, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, WINDOWBORDER+SCOREHEIGHT,     WINDOWBORDER,                     WINDOWBORDER);
+	// Draw minefield sides
+    context.drawImage(sprite, 176, WINDOWBORDER, WINDOWBORDER, 1,            0,                          (WINDOWBORDER*2)+SCOREHEIGHT, WINDOWBORDER,                     (16 * FIELDHEIGHT));
+    context.drawImage(sprite, 190, WINDOWBORDER, WINDOWBORDER, 1,            CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT, WINDOWBORDER,                     (16 * FIELDHEIGHT));
+	// Draw bottom border
+    context.drawImage(sprite, 176, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, 0,                          (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 187, (WINDOWBORDER*2)+3, 1,            WINDOWBORDER, WINDOWBORDER,               (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
+    context.drawImage(sprite, 190, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
 
-	if (gameover) {
-		context.drawImage(sprite, 68, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
-	} else {
-		context.drawImage(sprite, 41, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
-	}
+	// Drawing background for counters
+    context.drawImage(sprite, 5, 5, 6, 6, WINDOWBORDER, WINDOWBORDER, COUNTERWIDTH, SCOREHEIGHT);
 
-    for (x = 0; x < FIELDWIDTH; x += 1) {
-        for (y = 0; y < FIELDHEIGHT; y += 1) {
-        	// Adding 33 to give space for the bombs and time counters
-            if (guesses[x][y] === MOUSEDOWN) {
-                context.drawImage(sprite, 1 * 16, 0, 16, 16, x * 16, (y * 16) + 33, 16, 16);
-            } else if (guesses[x][y] === FLAGGED) {
-                context.drawImage(sprite, 4 * 16, 0, 16, 16, x * 16, (y * 16) + 33, 16, 16);
-            } else if (guesses[x][y] === GUESSED) {
-                context.drawImage(sprite, squares[x][y] * 16, 0, 16, 16, x * 16, (y * 16) + 33, 16, 16);
-            } else {
-                context.drawImage(sprite, 0 * 16, 0, 16, 16, x * 16, (y * 16) + 33, 16, 16);
-            }
-        }
-    }
+	// Drawing housings for counters
+	context.drawImage(sprite, 0, 39, 41, 25, WINDOWBORDER+5, WINDOWBORDER+4, 41, 25);
+	context.drawImage(sprite, 0, 39, 41, 25, COUNTERWIDTH-32, WINDOWBORDER+4, 41, 25);
 
+	// Drawing count of identified bombs
     var strBombsIdentified = String(bombsIdentified);
     var strlen = strBombsIdentified.length;
 	if (strlen === 3) {
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23,  6, 5, 13, 23);
-    	context.drawImage(sprite, (parseInt(strBombsIdentified[1]))*13, 16, 13, 23, 19, 5, 13, 23);
-	    context.drawImage(sprite, (parseInt(strBombsIdentified[2]))*13, 16, 13, 23, 32, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+    	context.drawImage(sprite, (parseInt(strBombsIdentified[1]))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+	    context.drawImage(sprite, (parseInt(strBombsIdentified[2]))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 2) {
-		context.drawImage(sprite, 0*13, 16, 13, 23,  6, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, 19, 5, 13, 23);
-    	context.drawImage(sprite, (parseInt(strBombsIdentified[1]))*13, 16, 13, 23, 32, 5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+    	context.drawImage(sprite, (parseInt(strBombsIdentified[1]))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 1) {
-		context.drawImage(sprite, 0*13, 16, 13, 23,  6, 5, 13, 23);
-		context.drawImage(sprite, 0*13, 16, 13, 23, 19, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, 32, 5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	}
 
+	// Drawing seconds counter
     var strSeconds;
 	if(seconds < 1000) {
 	    strSeconds = String(seconds);
@@ -286,18 +302,47 @@ function drawField() {
     }
    	strlen = strSeconds.length;
 	if (strlen === 3) {
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-45, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-32, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[2]))*13, 16, 13, 23, CANVASWIDTH-19, 5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[2]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 2) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-45, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-32, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-19, 5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 1) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-45, 5, 13, 23);
-		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-32, 5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-19, 5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
 	}
+
+	// Drawing game status smiley
+	switch (GAMESTATUS)  {
+		case GAMELOST:
+			context.drawImage(sprite, 68, 39, 27, 27, (COUNTERWIDTH/2)+WINDOWBORDER-13, WINDOWBORDER+2, 27, 27);
+			break;
+		case GAMEWON:
+			context.drawImage(sprite, 95, 39, 27, 27, (COUNTERWIDTH/2)+WINDOWBORDER-13, WINDOWBORDER+2, 27, 27);
+			break;
+		default:
+			context.drawImage(sprite, 41, 39, 27, 27, (COUNTERWIDTH/2)+WINDOWBORDER-13, WINDOWBORDER+2, 27, 27);
+	}
+
+	// Drawing actual minefield
+    for (x = 0; x < FIELDWIDTH; x += 1) {
+        for (y = 0; y < FIELDHEIGHT; y += 1) {
+        	// Adding 33 to give space for the bombs and time counters
+        	// Add 13 to x and y to give space for border
+            if (guesses[x][y] === MOUSEDOWN) {
+                context.drawImage(sprite, 1 * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+            } else if (guesses[x][y] === FLAGGED) {
+                context.drawImage(sprite, 4 * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+            } else if (guesses[x][y] === GUESSED) {
+                context.drawImage(sprite, squares[x][y] * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+            } else {
+                context.drawImage(sprite, 0 * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+            }
+        }
+    }
 }
 
 var nest = 0;
@@ -410,7 +455,7 @@ function clock() {
 }
 
 function userMousedOut(evt) {
-	if (!gameover && mousebtnheld) {
+	if (GAMESTATUS !== GAMELOST & mousebtnheld) {
 		guesses[clickX][clickY] = NOTGUESSED;
 		mousebtnheld = 0;
 	}
@@ -420,10 +465,10 @@ function userMousedOut(evt) {
 function userMousedDown(evt) {
 	evt.preventDefault();
 
-	clickX = Math.floor((evt.pageX - canvas.offsetLeft) / 16);
-	clickY = Math.floor(((evt.pageY - canvas.offsetTop) - 33) / 16); // subtracting 33 for the counters
+	clickX = Math.floor(((evt.pageX - canvas.offsetLeft) - WINDOWBORDER) / 16);
+	clickY = Math.floor(((evt.pageY - canvas.offsetTop) - (WINDOWBORDER * 2) - SCOREHEIGHT) / 16);
 
-	if (!gameover) {
+	if (GAMESTATUS === GAMEPLAYING) {
 		if (guesses[clickX][clickY] === NOTGUESSED) {
 			guesses[clickX][clickY] = MOUSEDOWN;
 		}
@@ -438,22 +483,22 @@ function userMousedUp(evt) {
 	mousebtnheld = 0;
 
 	// If mouse has been moved to a new square, release previous square and do nothing
-	if ((clickX != Math.floor((evt.pageX - canvas.offsetLeft) / 16)) ||
-		(clickY != Math.floor(((evt.pageY - canvas.offsetTop) - 33) / 16))) { // subtracting 33 for the counters
-		if (!gameover) {
+	if ((clickX != Math.floor(((evt.pageX - canvas.offsetLeft) - WINDOWBORDER) / 16)) ||
+		(clickY != Math.floor(((evt.pageY - canvas.offsetTop) - (WINDOWBORDER * 2) - SCOREHEIGHT) / 16))) {
+		if (GAMESTATUS !== GAMELOST) {
 			guesses[clickX][clickY] = NOTGUESSED;
 		}
 	} else {
 		// If this is the first move, start the timer
-		if (gamestart === 0) {
-			gamestart = 1;
+		if (GAMESTATUS === NOGAME) {
+			GAMESTATUS = GAMEPLAYING;
 			tmr = setInterval(function(){clock()},1000);
 		}
 
 		// If right-click
 		if (evt.button === 2) {
 			// Only let the player make changes when the game is still going
-			if (!gameover) {
+			if (GAMESTATUS === GAMEPLAYING) {
 				if (guesses[clickX][clickY] == FLAGGED) {
 					guesses[clickX][clickY] = NOTGUESSED;
 					bombsIdentified -= 1;
@@ -466,21 +511,23 @@ function userMousedUp(evt) {
 			}
 		// If left-click
 		} else {
-			if ((evt.pageX - canvas.offsetLeft) > (CANVASWIDTH/2)-13 && (evt.pageX - canvas.offsetLeft) < (CANVASWIDTH/2)+13 && (evt.pageY - canvas.offsetTop) > 3 && (evt.pageY - canvas.offsetTop) < 29 ) {
+			if ((evt.pageX - canvas.offsetLeft) > (CANVASWIDTH/2)-13 && (evt.pageX - canvas.offsetLeft) < (CANVASWIDTH/2)+13 && (evt.pageY - canvas.offsetTop) > WINDOWBORDER+3 && (evt.pageY - canvas.offsetTop) < +WINDOWBORDER+29 ) {
 				newGame(CURRENTGAME);
 			} else if (squares[clickX][clickY] === BOMB) {
-				for (x = 0; x < FIELDWIDTH; x += 1) {
-					for (y = 0; y < FIELDHEIGHT; y += 1) {
-						guesses[x][y] = GUESSED;
+				if (GAMESTATUS === GAMEPLAYING) {
+					for (x = 0; x < FIELDWIDTH; x += 1) {
+						for (y = 0; y < FIELDHEIGHT; y += 1) {
+							guesses[x][y] = GUESSED;
+						}
 					}
+					squares[clickX][clickY] = EXPLODED;
+					GAMESTATUS = GAMELOST;
+					clearInterval(tmr);
 				}
-				squares[clickX][clickY] = EXPLODED;
-				gameover = 1;
-				clearInterval(tmr);
 			} else {
 				// if game isn't over and
 				// square is currently hidden
-				if (!gameover && guesses[clickX][clickY] !== GUESSED) {
+				if (GAMESTATUS === GAMEPLAYING && guesses[clickX][clickY] !== GUESSED) {
 					guesses[clickX][clickY] = GUESSED;
 					// Check for adjacent blanks is clicked square is empty
 					if(squares[clickX][clickY] === EMPTY) {
@@ -491,8 +538,7 @@ function userMousedUp(evt) {
 		}
 
 		if(bombsIdentified === NUMBEROFBOMBS) {
-			context.drawImage(sprite, 95, 39, 27, 27, (CANVASWIDTH/2)-13, 2, 27, 27);
-			alert('Yay!. You won in ' + seconds + ' seconds!');
+			GAMESTATUS = GAMEWON;
 			clearInterval(tmr);
 
 			// Clear remaining hidden squares
@@ -529,12 +575,11 @@ function userKeyUp(evt) {
 // I: 16 × 16 field with 40 mines and 256 x 256 grid
 // E: 30 × 16 field with 99 mines and 480 x 256 grid
 function newGame(size) {
-	gameover = 0;
 	bombsIdentified = 0;
 	seconds = 0;
 	if(tmr)
 		clearInterval(tmr);
-	gamestart = 0;
+	GAMESTATUS = NOGAME;
 
     canvas = document.getElementById('canvas');
 	if (size === 40) {
@@ -550,12 +595,12 @@ function newGame(size) {
 		FIELDHEIGHT = 9;
 		CURRENTGAME = NUMBEROFBOMBS = 10;
 	}
-	CANVASWIDTH = 16 * FIELDWIDTH;
-	CANVASHEIGHT = (16 * FIELDHEIGHT) + 33;
+	CANVASWIDTH = (16 * FIELDWIDTH) + (WINDOWBORDER * 2);
+	CANVASHEIGHT = (16 * FIELDHEIGHT) + (WINDOWBORDER * 3) + SCOREHEIGHT;
 
-	document.getElementById('menubar').width = CANVASWIDTH;
-	document.getElementById('field').width = CANVASWIDTH;
-	document.getElementById('field').height = CANVASHEIGHT;
+	document.getElementById('menubar').style.width = CANVASWIDTH + "px";
+	document.getElementById('field').style.width = CANVASWIDTH + "px";
+	document.getElementById('field').style.height = CANVASHEIGHT + "px";
 
 	canvas.width = CANVASWIDTH;
 	canvas.height = CANVASHEIGHT;
