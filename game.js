@@ -16,20 +16,13 @@ var CANVASHEIGHT = (16 * FIELDHEIGHT) + (WINDOWBORDER*2);
 
 var CURRENTGAME = 9;
 
-var HIDDEN = 0;
 var EMPTY = 1;
 var BOMB = 2;
 var EXPLODED = 3;
-var FLAG = 4;
-var ONE = 5;
-var TWO = 6;
-var THREE = 7;
-var FOUR = 8;
-var FIVE = 9;
-var SIX = 10;
-var squares = new Array(FIELDWIDTH);
+
+var squares = [];
 for (x = 0; x < FIELDWIDTH; x += 1) {
-    squares[x] = new Array(FIELDHEIGHT);
+    squares[x] = [];
 }
 
 var NOTGUESSED = 0;
@@ -51,9 +44,9 @@ var GAMEWON = 3;
 var clickX, clickY;
 
 function resetGuesses() {
-	guesses = new Array(FIELDWIDTH);
+	guesses = [];
 	for (x = 0; x < FIELDWIDTH; x += 1) {
-		guesses[x] = new Array(FIELDHEIGHT);
+		guesses[x] = [];
 		for (y = 0; y < FIELDHEIGHT; y += 1) {
 			guesses[x][y] = NOTGUESSED;
 		}
@@ -65,16 +58,15 @@ var NOTCHECKED = 0;
 var CHECKED = 1;
 
 function resetChecks() {
-	checks = new Array(FIELDWIDTH);
+	checks = [];
 	for (x = 0; x < FIELDWIDTH; x += 1) {
-		checks[x] = new Array(FIELDHEIGHT);
+		checks[x] = [];
 		for (y = 0; y < FIELDHEIGHT; y += 1) {
 			checks[x][y] = NOTCHECKED;
 		}
 	}
 }
 
-var i, j;
 function isBomb(i, j) {
 	var retVal = 0;
     // We don't want to check off the side of the grid
@@ -90,9 +82,7 @@ var canvas;
 var context;
 var sprite;
 function drawField() {
-	var status = '';
-
-	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
+	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2), strBombsIdentified = String(bombsIdentified), strlen = strBombsIdentified.length, strSeconds;
 
 	// Draw top border
     context.drawImage(sprite, 176, 0,            WINDOWBORDER, WINDOWBORDER, 0,                          0,                            WINDOWBORDER,                     WINDOWBORDER);
@@ -121,24 +111,21 @@ function drawField() {
 	context.drawImage(sprite, 0, 39, 41, 25, COUNTERWIDTH-32, WINDOWBORDER+4, 41, 25);
 
 	// Drawing count of identified bombs
-    var strBombsIdentified = String(bombsIdentified);
-    var strlen = strBombsIdentified.length;
 	if (strlen === 3) {
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
-    	context.drawImage(sprite, (parseInt(strBombsIdentified[1]))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-	    context.drawImage(sprite, (parseInt(strBombsIdentified[2]))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strBombsIdentified[0], 10))*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+    	context.drawImage(sprite, (parseInt(strBombsIdentified[1], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+	    context.drawImage(sprite, (parseInt(strBombsIdentified[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 2) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-    	context.drawImage(sprite, (parseInt(strBombsIdentified[1]))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strBombsIdentified[0], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+    	context.drawImage(sprite, (parseInt(strBombsIdentified[1], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 1) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, 0*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0]))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strBombsIdentified[0], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	}
 
 	// Drawing seconds counter
-    var strSeconds;
 	if(seconds < 1000) {
 	    strSeconds = String(seconds);
     } else {
@@ -146,17 +133,17 @@ function drawField() {
     }
    	strlen = strSeconds.length;
 	if (strlen === 3) {
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[2]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0], 10))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[1], 10))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[2], 10))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 2) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[1]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0], 10))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[1], 10))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 1) {
-		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, 0*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strSeconds[0]))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-45, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, 0, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strSeconds[0], 10))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
 	}
 
 	// Drawing game status smiley
@@ -177,13 +164,13 @@ function drawField() {
         	// Adding 33 to give space for the bombs and time counters
         	// Add 13 to x and y to give space for border
             if (guesses[x][y] === MOUSEDOWN) {
-                context.drawImage(sprite, 1 * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                context.drawImage(sprite, 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else if (guesses[x][y] === FLAGGED) {
-                context.drawImage(sprite, 4 * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                context.drawImage(sprite, 64, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else if (guesses[x][y] === GUESSED) {
                 context.drawImage(sprite, squares[x][y] * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else {
-                context.drawImage(sprite, 0 * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                context.drawImage(sprite, 0, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             }
         }
     }
@@ -192,7 +179,6 @@ function drawField() {
 var nest = 0;
 function checkForAdjacentBlanks(r, s) {
 	nest += 1;
-	var retVal = 0;
 	if(s > 0) {
 		if (r > 0) {
 			if(squares[r - 1][s - 1] === EMPTY || squares[r - 1][s - 1] > 4) {
@@ -298,8 +284,8 @@ function clock() {
     drawField();
 }
 
-function userMousedOut(evt) {
-	if (GAMESTATUS !== GAMELOST & mousebtnheld) {
+function userMousedOut() {
+	if (GAMESTATUS !== GAMELOST && mousebtnheld) {
 		guesses[clickX][clickY] = NOTGUESSED;
 		mousebtnheld = 0;
 	}
@@ -327,8 +313,8 @@ function userMousedUp(evt) {
 	mousebtnheld = 0;
 
 	// If mouse has been moved to a new square, release previous square and do nothing
-	if ((clickX != Math.floor(((evt.pageX - canvas.offsetLeft) - WINDOWBORDER) / 16)) ||
-		(clickY != Math.floor(((evt.pageY - canvas.offsetTop) - (WINDOWBORDER * 2) - SCOREHEIGHT) / 16))) {
+	if ((clickX !==Math.floor(((evt.pageX - canvas.offsetLeft) - WINDOWBORDER) / 16)) ||
+		(clickY !==Math.floor(((evt.pageY - canvas.offsetTop) - (WINDOWBORDER * 2) - SCOREHEIGHT) / 16))) {
 		if (GAMESTATUS !== GAMELOST) {
 			guesses[clickX][clickY] = NOTGUESSED;
 		}
@@ -336,14 +322,14 @@ function userMousedUp(evt) {
 		// If this is the first move, start the timer
 		if (GAMESTATUS === NOGAME) {
 			GAMESTATUS = GAMEPLAYING;
-			tmr = setInterval(function(){clock()},1000);
+			tmr = setInterval(function(){clock();},1000);
 		}
 
 		// If right-click
 		if (evt.button === 2) {
 			// Only let the player make changes when the game is still going
 			if (GAMESTATUS === GAMEPLAYING) {
-				if (guesses[clickX][clickY] == FLAGGED) {
+				if (guesses[clickX][clickY] === FLAGGED) {
 					guesses[clickX][clickY] = NOTGUESSED;
 					bombsIdentified -= 1;
 				} else if (guesses[clickX][clickY] === GUESSED) {
@@ -404,13 +390,13 @@ function userRightClicked(evt) {
 }
 
 function userKeyUp(evt) {
-	if (evt.keyCode == 66 ) { // beginner
+	if (evt.keyCode === 66 ) { // beginner
 		newGame(10);
-	} else if (evt.keyCode == 69 ) { // expert
+	} else if (evt.keyCode === 69 ) { // expert
 		newGame(99);
-	} else if (evt.keyCode == 73 ) { // intermediate
+	} else if (evt.keyCode === 73 ) { // intermediate
 		newGame(40);
-	} else if (evt.keyCode == 78 ) { // new
+	} else if (evt.keyCode === 78 ) { // new
 		newGame(CURRENTGAME);
 	}
 }
@@ -419,10 +405,13 @@ function userKeyUp(evt) {
 // I: 16 × 16 field with 40 mines and 256 x 256 grid
 // E: 30 × 16 field with 99 mines and 480 x 256 grid
 function newGame(size) {
+    var randomX, randomY, count;
+
 	bombsIdentified = 0;
 	seconds = 0;
-	if(tmr)
+	if(tmr) {
 		clearInterval(tmr);
+	}
 	GAMESTATUS = NOGAME;
 
     canvas = document.getElementById('canvas');
@@ -450,9 +439,9 @@ function newGame(size) {
 	canvas.height = CANVASHEIGHT;
     context = canvas.getContext('2d');
 
-	squares = new Array(FIELDWIDTH);
+	squares = [];
 	for (x = 0; x < FIELDWIDTH; x += 1) {
-		squares[x] = new Array(FIELDHEIGHT);
+		squares[x] = [];
 	}
 	resetGuesses();
 
@@ -476,7 +465,8 @@ function newGame(size) {
     // Generate bomb locations
     x = 0;
     while (x < NUMBEROFBOMBS) {
-        var randomX = Math.floor(Math.random() * FIELDWIDTH), randomY = Math.floor(Math.random() * FIELDHEIGHT);
+        randomX = Math.floor(Math.random() * FIELDWIDTH);
+        randomY = Math.floor(Math.random() * FIELDHEIGHT);
         if (squares[randomX][randomY] !== BOMB) {
             squares[randomX][randomY] = BOMB;
             x += 1;
@@ -487,7 +477,7 @@ function newGame(size) {
     for (x = 0; x < FIELDWIDTH; x += 1) {
         for (y = 0; y < FIELDHEIGHT; y += 1) {
             if (squares[x][y] !== BOMB) {
-                var count = 0;
+                count = 0;
                 count = count + isBomb(x - 1, y - 1);
                 count = count + isBomb(x, y - 1);
                 count = count + isBomb(x + 1, y - 1);
@@ -498,7 +488,9 @@ function newGame(size) {
                 count = count + isBomb(x - 1, y + 1);
                 count = count + isBomb(x, y + 1);
                 count = count + isBomb(x + 1, y + 1);
-                if (count > 0) squares[x][y] = 4 + count;
+                if (count > 0) {
+                	squares[x][y] = 4 + count;
+                }
             }
         }
     }
@@ -506,6 +498,6 @@ function newGame(size) {
     // Draw minefield
     sprite.onload = function() {
         drawField();
-    }
+    };
 
 }
