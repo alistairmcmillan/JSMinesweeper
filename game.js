@@ -108,7 +108,7 @@ function drawField() {
 
 	// Drawing housings for counters
 	context.drawImage(sprite, 0, 39, 41, 25, WINDOWBORDER+5, WINDOWBORDER+4, 41, 25);
-	context.drawImage(sprite, 0, 39, 41, 25, COUNTERWIDTH-32, WINDOWBORDER+4, 41, 25);
+	context.drawImage(sprite, 0, 39, 41, 25, COUNTERWIDTH-35, WINDOWBORDER+4, 41, 25);
 
 	// Drawing count of identified bombs
 	if (strlen === 3) {
