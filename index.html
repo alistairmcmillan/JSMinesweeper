@@ -90,6 +90,30 @@ div#menubar ul ul li a:hover {
 	background: #0a246a;
 	color: white;
 }
+div#scorediv, div#newscorediv {
+	position:absolute;
+	top:25%;
+	left:50%;
+	background-color:#d4d0c8;
+	z-index:1002;
+	overflow:auto;
+	width:40em;
+	height:40em;
+	margin-left:-20em;
+	margin-top:-10em;
+	border-right:2px solid black;
+	border-bottom:2px solid black;
+	text-align: center;
+}
+div#scorediv table {
+	margin-left: auto;
+	margin-right: auto;
+}
+div#scorediv th, div#scorediv td {
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: center;
+}
 </style>
 </head>
 
@@ -109,20 +133,20 @@ div#menubar ul ul li a:hover {
 				<li><hr width="90%" /></li>
 				<li><a href="#"><u>M</u>arks (?)</a></li>
 				<li><a href="#">Co<u>l</u>or</a></li>
-				<li><a href="#"><u>S</u>ound</a></li>
+				<li><a href="#"><u>S</u>ound</a></li> -->
 				<li><hr width="90%" /></li>
-				<li><a href="#">Best&nbsp;<u>T</u>imes...</a></li> -->
+				<li><a href="Javascript:showScores();">Best&nbsp;<u>T</u>imes...</a></li>
 			</ul>
 		</li>
-<!--	<li><a href="#"><u>H</u>elp</a>
+	<li><a href="#"><u>H</u>elp</a>
 			<ul>
-				<li><a href="#"><u>C</u>ontents</a></li>
+<!--			<li><a href="#"><u>C</u>ontents</a></li>
 				<li><a href="#"><u>S</u>earch&nbsp;for&nbsp;Help&nbsp;on...</a></li>
 				<li><a href="#">Using&nbsp;<u>H</u>elp</a></li>
-				<li><hr /></li>
+				<li><hr /></li> -->
 				<li><a href="#"><u>A</u>bout&nbsp;Minesweeper...</a></li>
 			</ul>
-		</li> -->
+		</li>
 	</ul>
 </div>
 
@@ -148,12 +172,38 @@ div#menubar ul ul li a:hover {
 <h3>TODO</h3>
 <ul>
 <li>Touch controls for iPhone, iPad, other devices</li>
-<li>Scoreboard</li>
+</ul>
+<h3>KNOWN BUGS</h3>
+<ul>
+<li>Menu should disappear after you click on a menuitem</li>
+<li>Win calculation is utterly wrong - should be tracking cleared squares not flagged squares, dumb ass</li>
 </ul>
 </div>
 
+<div id='scorediv' style='display:none;'>
+<h1>Fastest Mine Sweepers</h1>
+<table id='scoretable'>
+<tbody></tbody>
+</table>
+<button id='hide' onClick='JavaScript:hideScores();'>OK</button>
+</div>
+
+<div id='newscorediv' style='display:none;'>
+<h1>Congratulations</h1>
+<p>You have a high score. Please enter your name.</p>
+<br />
+<input id='nomdeplume' placeholder='Your name'>
+<br />
+<button id='submitname' onClick='JavaScript:saveScore();'>OK</button>
+</div>
+
+<script type="text/javascript" src="jquery.js"></script> 
 <script type="text/javascript" src="game.js"></script>
 <script>
+	$(document).ready(function(e) {
+		 loadScores();
+	});
+
 	window.onload = function () {
 		newGame();
 	}

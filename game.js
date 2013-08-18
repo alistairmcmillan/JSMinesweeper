@@ -41,6 +41,8 @@ var GAMEPLAYING = 1;
 var GAMELOST = 2;
 var GAMEWON = 3;
 
+var SUBMITTINGSCORE = 0;
+
 var clickX, clickY;
 
 function resetGuesses() {
@@ -284,12 +286,81 @@ function clock() {
     drawField();
 }
 
+function showScores() {
+	if(document.getElementById('scorediv').style.display === "none") {
+		document.getElementById('scorediv').style.display = "block";
+	} else {
+		document.getElementById('scorediv').style.display = "none";
+	}
+}
+
+function hideScores() {
+	document.getElementById('scorediv').style.display = "none";
+}
+
 function userMousedOut() {
 	if (GAMESTATUS !== GAMELOST && mousebtnheld) {
 		guesses[clickX][clickY] = NOTGUESSED;
 		mousebtnheld = 0;
 	}
 	drawField();
+}
+
+function loadScores() {
+    $.ajax({
+		url: 'get_scores.php', data: "", dataType: 'json',  success: function(rows)
+		{
+			var currentLevel = 0;
+			$('table#scoretable tbody tr').remove();
+			for(var i = 0; i < rows.length; i++) {
+				if (currentLevel !== rows[i].level) {
+					switch(rows[i].level) {
+						case '1':
+							$('table#scoretable tbody').append('<tr><th>Beginner</th></tr>');
+							break;
+						case '2':
+							$('table#scoretable tbody').append('<tr><th>Intermediate</th></tr>');
+							break;
+						case '3':
+							$('table#scoretable tbody').append('<tr><th>Expert</th></tr>');
+							break;
+					}
+					currentLevel = rows[i].level;
+				}
+				var t = rows[i].date.split(/[- :]/);
+				var d = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+				$('table#scoretable tbody').append('<tr><td></td><td>' + rows[i].time + ' seconds</td><td>' + rows[i].name + '</td><td>' + ( d.getHours() < 10 ? "0" : "" ) + d.getHours() + ':' + ( d.getMinutes() < 10 ? "0" : "" ) + d.getMinutes() + ' ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '</td></tr>');
+			}
+		}
+	});
+}
+
+function saveScore() {
+	var currentlevel;
+	switch (CURRENTGAME) {
+		case 10:
+			currentlevel = 1;
+			break;
+		case 40:
+			currentlevel = 2;
+			break;
+		case 99:
+			currentlevel = 3;
+			break;
+		default:
+			break;
+	}
+	$.ajax({
+		url: 'save_score.php', data: { level: currentlevel, name: document.getElementById('nomdeplume').value, time: seconds }, dataType: 'json',  success: function(rows)
+		{
+			// Do stuff
+		}
+	});
+	document.getElementById('newscorediv').style.display = "none";
+	SUBMITTINGSCORE = 0;
+	setTimeout(function () {
+		loadScores();
+    }, 2500);
 }
 
 function userMousedDown(evt) {
@@ -380,6 +451,10 @@ function userMousedUp(evt) {
 				}
 			}
 
+			if (seconds < 999) {
+				SUBMITTINGSCORE = 1;
+				document.getElementById('newscorediv').style.display = "block";
+			}
 		}
 	}
     drawField();
@@ -390,14 +465,16 @@ function userRightClicked(evt) {
 }
 
 function userKeyUp(evt) {
-	if (evt.keyCode === 66 ) { // beginner
-		newGame(10);
-	} else if (evt.keyCode === 69 ) { // expert
-		newGame(99);
-	} else if (evt.keyCode === 73 ) { // intermediate
-		newGame(40);
-	} else if (evt.keyCode === 78 ) { // new
-		newGame(CURRENTGAME);
+	if (SUBMITTINGSCORE === 0) {
+		if (evt.keyCode === 66 ) { // beginner
+			newGame(10);
+		} else if (evt.keyCode === 69 ) { // expert
+			newGame(99);
+		} else if (evt.keyCode === 73 ) { // intermediate
+			newGame(40);
+		} else if (evt.keyCode === 78 ) { // new
+			newGame(CURRENTGAME);
+		}
 	}
 }
 
