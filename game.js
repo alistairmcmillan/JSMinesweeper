@@ -31,6 +31,7 @@ var FLAGGED = 2;
 var MOUSEDOWN = 3;
 var guesses;				// array that holds players changes to board
 var bombsIdentified = 0;
+var squaresCleared = 0;
 var seconds = 0;
 var tmr = 0;
 var mousebtnheld = 0;
@@ -51,6 +52,17 @@ function resetGuesses() {
 		guesses[x] = [];
 		for (y = 0; y < FIELDHEIGHT; y += 1) {
 			guesses[x][y] = NOTGUESSED;
+		}
+	}
+}
+
+function countClearedSquares() {
+	squaresCleared = 0;
+	for (x = 0; x < FIELDWIDTH; x += 1) {
+		for (y = 0; y < FIELDHEIGHT; y += 1) {
+			if (guesses[x][y] === GUESSED) {
+				squaresCleared += 1;
+			}
 		}
 	}
 }
@@ -434,11 +446,12 @@ function userMousedUp(evt) {
 					if(squares[clickX][clickY] === EMPTY) {
 						checkForAdjacentBlanks(clickX, clickY);
 					}
+					countClearedSquares();
 				}
 			}
 		}
 
-		if(bombsIdentified === NUMBEROFBOMBS) {
+		if(squaresCleared === (FIELDWIDTH*FIELDHEIGHT)-NUMBEROFBOMBS) {
 			GAMESTATUS = GAMEWON;
 			clearInterval(tmr);
 
@@ -446,7 +459,7 @@ function userMousedUp(evt) {
 			for (x = 0; x < FIELDWIDTH; x += 1) {
 				for (y = 0; y < FIELDHEIGHT; y += 1) {
 					if (guesses[x][y] === NOTGUESSED) {
-						guesses[x][y] = GUESSED;
+						guesses[x][y] = FLAGGED;
 					}
 				}
 			}
