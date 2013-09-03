@@ -455,10 +455,10 @@ function userMousedUp(evt) {
 			GAMESTATUS = GAMEWON;
 			clearInterval(tmr);
 
-			// Clear remaining hidden squares
+			// Flag remaining hidden bombs
 			for (x = 0; x < FIELDWIDTH; x += 1) {
 				for (y = 0; y < FIELDHEIGHT; y += 1) {
-					if (guesses[x][y] === NOTGUESSED) {
+					if (squares[x][y] === BOMB) {
 						guesses[x][y] = FLAGGED;
 					}
 				}
