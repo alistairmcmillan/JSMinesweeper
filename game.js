@@ -29,6 +29,7 @@ var NOTGUESSED = 0;
 var GUESSED = 1;
 var FLAGGED = 2;
 var MOUSEDOWN = 3;
+var MARKED = 4;
 var guesses;				// array that holds players changes to board
 var bombsIdentified = 0;
 var squaresCleared = 0;
@@ -41,6 +42,8 @@ var NOGAME = 0;
 var GAMEPLAYING = 1;
 var GAMELOST = 2;
 var GAMEWON = 3;
+
+var MARKSON = 0;
 
 var SUBMITTINGSCORE = 0;
 
@@ -179,6 +182,8 @@ function drawField() {
         	// Add 13 to x and y to give space for border
             if (guesses[x][y] === MOUSEDOWN) {
                 context.drawImage(sprite, 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+            } else if (guesses[x][y] === MARKED) {
+                context.drawImage(sprite, 130, 16, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else if (guesses[x][y] === FLAGGED) {
                 context.drawImage(sprite, 64, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else if (guesses[x][y] === GUESSED) {
@@ -298,6 +303,16 @@ function clock() {
     drawField();
 }
 
+function setMarks() {
+	if(MARKSON === 1) {
+		MARKSON = 0;
+		document.getElementById('marksanchor').innerHTML = "<u>M</u>arks (?)";
+	} else {
+		MARKSON = 1;
+		document.getElementById('marksanchor').innerHTML = "&#10003;&nbsp;<u>M</u>arks (?)";
+	}
+}
+
 function showScores() {
 	if(document.getElementById('scorediv').style.display === "none") {
 		document.getElementById('scorediv').style.display = "block";
@@ -412,9 +427,16 @@ function userMousedUp(evt) {
 		if (evt.button === 2) {
 			// Only let the player make changes when the game is still going
 			if (GAMESTATUS === GAMEPLAYING) {
-				if (guesses[clickX][clickY] === FLAGGED) {
+				if (guesses[clickX][clickY] === MARKED) {
 					guesses[clickX][clickY] = NOTGUESSED;
-					bombsIdentified -= 1;
+				} else if (guesses[clickX][clickY] === FLAGGED) {
+					if (MARKSON) {
+						guesses[clickX][clickY] = MARKED;
+						bombsIdentified -= 1;
+					} else {
+						guesses[clickX][clickY] = NOTGUESSED;
+						bombsIdentified -= 1;
+					}
 				} else if (guesses[clickX][clickY] === GUESSED) {
 					// Do nothing to squares that have already been cleared
 				} else {
@@ -505,18 +527,25 @@ function newGame(size) {
 	GAMESTATUS = NOGAME;
 
     canvas = document.getElementById('canvas');
+	document.getElementById('beginneranchor').innerHTML = "<u>B</u>eginner";
+	document.getElementById('intermediateanchor').innerHTML = "<u>I</u>ntermediate";
+	document.getElementById('expertanchor').innerHTML = "<u>E</u>xpert";
+
 	if (size === 40) {
 		FIELDWIDTH = 16;
 		FIELDHEIGHT = 16;
 		CURRENTGAME = NUMBEROFBOMBS = 40;
+		document.getElementById('intermediateanchor').innerHTML = "&#10003;&nbsp;<u>I</u>ntermediate";
 	} else if (size === 99) {
 		FIELDWIDTH = 30;
 		FIELDHEIGHT = 16;
 		CURRENTGAME = NUMBEROFBOMBS = 99;
+		document.getElementById('expertanchor').innerHTML = "&#10003;&nbsp;<u>E</u>xpert";
 	} else {
 		FIELDWIDTH = 9;
 		FIELDHEIGHT = 9;
 		CURRENTGAME = NUMBEROFBOMBS = 10;
+		document.getElementById('beginneranchor').innerHTML = "&#10003;&nbsp;<u>B</u>eginner";
 	}
 	CANVASWIDTH = (16 * FIELDWIDTH) + (WINDOWBORDER * 2);
 	CANVASHEIGHT = (16 * FIELDHEIGHT) + (WINDOWBORDER * 3) + SCOREHEIGHT;
