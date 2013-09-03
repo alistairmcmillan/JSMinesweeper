@@ -341,7 +341,7 @@ function loadScores() {
 				}
 				var t = rows[i].date.split(/[- :]/);
 				var d = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
-				$('table#scoretable tbody').append('<tr><td></td><td>' + rows[i].time + ' seconds</td><td>' + rows[i].name + '</td><td>' + ( d.getHours() < 10 ? "0" : "" ) + d.getHours() + ':' + ( d.getMinutes() < 10 ? "0" : "" ) + d.getMinutes() + ' ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '</td></tr>');
+				$('table#scoretable tbody').append('<tr><td></td><td>' + rows[i].time + ' seconds</td><td>' + rows[i].name + '</td><td>' + ( d.getHours() < 10 ? "0" : "" ) + d.getHours() + ':' + ( d.getMinutes() < 10 ? "0" : "" ) + d.getMinutes() + ' ' + ( d.getDate() < 10 ? "0" : "" ) + d.getDate() + '/' + ( (d.getMonth()+1) < 10 ? "0" : "" ) + (d.getMonth()+1) + '/' + d.getFullYear() + '</td></tr>');
 			}
 		}
 	});
