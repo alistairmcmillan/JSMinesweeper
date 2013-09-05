@@ -17,13 +17,13 @@
 	// 2) Query database for data
 	//--------------------------------------------------------------------------
 	$pdo=new PDO("mysql:dbname=".$databaseName.";host=".$server,$user_name,$password);
-	$statement=$pdo->prepare("SELECT * FROM scores WHERE level=1 ORDER BY time ASC LIMIT 5");
+	$statement=$pdo->prepare("SELECT * FROM scores WHERE level=1 ORDER BY time ASC");
 	$statement->execute();
 	$array1=$statement->fetchAll(PDO::FETCH_ASSOC);
-	$statement=$pdo->prepare("SELECT * FROM scores WHERE level=2 ORDER BY time ASC LIMIT 5");
+	$statement=$pdo->prepare("SELECT * FROM scores WHERE level=2 ORDER BY time ASC");
 	$statement->execute();
 	$array2=$statement->fetchAll(PDO::FETCH_ASSOC);
-	$statement=$pdo->prepare("SELECT * FROM scores WHERE level=3 ORDER BY time ASC LIMIT 5");
+	$statement=$pdo->prepare("SELECT * FROM scores WHERE level=3 ORDER BY time ASC");
 	$statement->execute();
 	$array3=$statement->fetchAll(PDO::FETCH_ASSOC);
 	

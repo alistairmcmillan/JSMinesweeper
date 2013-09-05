@@ -25,8 +25,8 @@ var GUESSED = 1;
 var FLAGGED = 2;
 var MOUSEDOWN = 3;
 var MARKED = 4;
-var bombsIdentified = 0;
 var squaresCleared = 0;
+var squaresFlagged = 0;
 var seconds = 0;
 var tmr = 0;
 var mousebtnheld = 0;
@@ -51,6 +51,7 @@ function resetArrays() {
 	var randomX, randomY, count;
 
 	squaresCleared = 0;
+	squaresFlagged = 0;
 
 	squares = [];
 	guesses = [];
@@ -100,6 +101,17 @@ function resetArrays() {
     }
 }
 
+function countFlaggedSquares() {
+	squaresFlagged = 0;
+	for (x = 0; x < FIELDWIDTH; x += 1) {
+		for (y = 0; y < FIELDHEIGHT; y += 1) {
+			if (guesses[x][y] === FLAGGED) {
+				squaresFlagged += 1;
+			}
+		}
+	}
+}
+
 function countClearedSquares() {
 	squaresCleared = 0;
 	for (x = 0; x < FIELDWIDTH; x += 1) {
@@ -129,26 +141,29 @@ var canvas;
 var context;
 var sprite;
 function drawField() {
-	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2), strBombsIdentified = String(bombsIdentified), strlen = strBombsIdentified.length, strSeconds;
+	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
+	var strRemainingBombCount;
+	var strlen;
+	var strSeconds;
 
 	// Draw top border
-    context.drawImage(sprite, 176, 0,            WINDOWBORDER, WINDOWBORDER, 0,                          0,                            WINDOWBORDER,                     WINDOWBORDER);
-    context.drawImage(sprite, 187, 0,            1,            WINDOWBORDER, WINDOWBORDER,               0,                            CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
-    context.drawImage(sprite, 190, 0,            WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, 0,                            WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 208, 0,            WINDOWBORDER, WINDOWBORDER, 0,                          0,                            WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 219, 0,            1,            WINDOWBORDER, WINDOWBORDER,               0,                            CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
+    context.drawImage(sprite, 222, 0,            WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, 0,                            WINDOWBORDER,                     WINDOWBORDER);
 	// Draw scoreheader sides
-    context.drawImage(sprite, 176, WINDOWBORDER, WINDOWBORDER, 1,            0,                          WINDOWBORDER,                 WINDOWBORDER,                     SCOREHEIGHT);
-    context.drawImage(sprite, 190, WINDOWBORDER, WINDOWBORDER, 1,            CANVASWIDTH - WINDOWBORDER, WINDOWBORDER,                 WINDOWBORDER,                     SCOREHEIGHT);
+    context.drawImage(sprite, 208, WINDOWBORDER, WINDOWBORDER, 1,            0,                          WINDOWBORDER,                 WINDOWBORDER,                     SCOREHEIGHT);
+    context.drawImage(sprite, 222, WINDOWBORDER, WINDOWBORDER, 1,            CANVASWIDTH - WINDOWBORDER, WINDOWBORDER,                 WINDOWBORDER,                     SCOREHEIGHT);
 	// Draw middle border
-    context.drawImage(sprite, 176, WINDOWBORDER, WINDOWBORDER, WINDOWBORDER, 0,                          WINDOWBORDER+SCOREHEIGHT,     WINDOWBORDER,                     WINDOWBORDER);
-    context.drawImage(sprite, 187, WINDOWBORDER, 1,            WINDOWBORDER, WINDOWBORDER,               WINDOWBORDER+SCOREHEIGHT,     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
-    context.drawImage(sprite, 190, WINDOWBORDER, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, WINDOWBORDER+SCOREHEIGHT,     WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 208, WINDOWBORDER, WINDOWBORDER, WINDOWBORDER, 0,                          WINDOWBORDER+SCOREHEIGHT,     WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 219, WINDOWBORDER, 1,            WINDOWBORDER, WINDOWBORDER,               WINDOWBORDER+SCOREHEIGHT,     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
+    context.drawImage(sprite, 222, WINDOWBORDER, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, WINDOWBORDER+SCOREHEIGHT,     WINDOWBORDER,                     WINDOWBORDER);
 	// Draw minefield sides
-    context.drawImage(sprite, 176, WINDOWBORDER, WINDOWBORDER, 1,            0,                          (WINDOWBORDER*2)+SCOREHEIGHT, WINDOWBORDER,                     (16 * FIELDHEIGHT));
-    context.drawImage(sprite, 190, WINDOWBORDER, WINDOWBORDER, 1,            CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT, WINDOWBORDER,                     (16 * FIELDHEIGHT));
+    context.drawImage(sprite, 208, WINDOWBORDER, WINDOWBORDER, 1,            0,                          (WINDOWBORDER*2)+SCOREHEIGHT, WINDOWBORDER,                     (16 * FIELDHEIGHT));
+    context.drawImage(sprite, 222, WINDOWBORDER, WINDOWBORDER, 1,            CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT, WINDOWBORDER,                     (16 * FIELDHEIGHT));
 	// Draw bottom border
-    context.drawImage(sprite, 176, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, 0,                          (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
-    context.drawImage(sprite, 187, (WINDOWBORDER*2)+3, 1,            WINDOWBORDER, WINDOWBORDER,               (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
-    context.drawImage(sprite, 190, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 208, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, 0,                          (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
+    context.drawImage(sprite, 219, (WINDOWBORDER*2)+3, 1,            WINDOWBORDER, WINDOWBORDER,               (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
+    context.drawImage(sprite, 222, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
 
 	// Drawing background for counters
     context.drawImage(sprite, 5, 5, 6, 6, WINDOWBORDER, WINDOWBORDER, COUNTERWIDTH, SCOREHEIGHT);
@@ -158,18 +173,33 @@ function drawField() {
 	context.drawImage(sprite, 0, 39, 41, 25, COUNTERWIDTH-35, WINDOWBORDER+4, 41, 25);
 
 	// Drawing count of identified bombs
+	countFlaggedSquares();
+	strRemainingBombCount = String(NUMBEROFBOMBS-squaresFlagged);
+	strlen = strRemainingBombCount.length;
 	if (strlen === 3) {
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0], 10))*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[1], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		if (strRemainingBombCount[0] === '-') {
+			context.drawImage(sprite, 130, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		} else {
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[0], 10))*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		}
 	} else if (strlen === 2) {
-		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[1], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		if (strRemainingBombCount[0] === '-') {
+			context.drawImage(sprite, 130, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite,   0, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		} else {
+			context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[0], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
+			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		}
 	} else if (strlen === 1) {
 		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-		context.drawImage(sprite, (parseInt(strBombsIdentified[0], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
+		context.drawImage(sprite, (parseInt(strRemainingBombCount[0], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	}
 
 	// Drawing seconds counter
@@ -213,7 +243,7 @@ function drawField() {
             if (guesses[x][y] === MOUSEDOWN) {
                 context.drawImage(sprite, 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else if (guesses[x][y] === MARKED) {
-                context.drawImage(sprite, 130, 16, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                context.drawImage(sprite, 143, 16, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else if (guesses[x][y] === FLAGGED) {
                 context.drawImage(sprite, 64, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
             } else if (guesses[x][y] === GUESSED) {
@@ -386,14 +416,20 @@ function loadScores() {
 				}
 				var t = rows[i].date.split(/[- :]/);
 				var d = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
-				$('table#scoretable tbody').append('<tr><td></td><td>' + rows[i].time + ' seconds</td><td>' + rows[i].name + '</td><td>' + ( d.getHours() < 10 ? "0" : "" ) + d.getHours() + ':' + ( d.getMinutes() < 10 ? "0" : "" ) + d.getMinutes() + ' ' + ( d.getDate() < 10 ? "0" : "" ) + d.getDate() + '/' + ( (d.getMonth()+1) < 10 ? "0" : "" ) + (d.getMonth()+1) + '/' + d.getFullYear() + '</td></tr>');
+				var strWithoutFlags = '';
+				if (rows[i].withoutflags === '1') {
+					strWithoutFlags = '<td><img src="sunglasses.png" width=12 height=12 alt="Completed without using flags" title="Completed without using flags" /></td>';
+				} else {
+					strWithoutFlags = '<td></td>';
+				}
+				$('table#scoretable tbody').append('<tr><td></td><td>' + rows[i].time + ' seconds</td>' + strWithoutFlags + '<td>' + rows[i].name + '</td><td>' + ( d.getHours() < 10 ? "0" : "" ) + d.getHours() + ':' + ( d.getMinutes() < 10 ? "0" : "" ) + d.getMinutes() + ' ' + ( d.getDate() < 10 ? "0" : "" ) + d.getDate() + '/' + ( (d.getMonth()+1) < 10 ? "0" : "" ) + (d.getMonth()+1) + '/' + d.getFullYear() + '</td></tr>');
 			}
 		}
 	});
 }
 
 function saveScore() {
-	var currentlevel;
+	var currentlevel, withoutflags;
 	switch (CURRENTGAME) {
 		case 10:
 			currentlevel = 1;
@@ -407,8 +443,13 @@ function saveScore() {
 		default:
 			break;
 	}
+	if (squaresFlagged === 0) {
+		withoutflags = 1;
+	} else {
+		withoutflags = 0;
+	}
 	$.ajax({
-		url: 'save_score.php', data: { level: currentlevel, name: document.getElementById('nomdeplume').value, time: seconds }, dataType: 'json',  success: function(rows)
+		url: 'save_score.php', data: { level: currentlevel, name: document.getElementById('nomdeplume').value, time: seconds, withoutflags: withoutflags }, dataType: 'json',  success: function(rows)
 		{
 			// Do stuff
 		}
@@ -465,16 +506,13 @@ function userMousedUp(evt) {
 					} else if (guesses[clickX][clickY] === FLAGGED) {
 						if (MARKSON) {
 							guesses[clickX][clickY] = MARKED;
-							bombsIdentified -= 1;
 						} else {
 							guesses[clickX][clickY] = NOTGUESSED;
-							bombsIdentified -= 1;
 						}
 					} else if (guesses[clickX][clickY] === GUESSED) {
 						// Do nothing to squares that have already been cleared
 					} else {
 						guesses[clickX][clickY] = FLAGGED;
-						bombsIdentified += 1;
 					}
 				}
 			}
@@ -522,6 +560,10 @@ function userMousedUp(evt) {
 			GAMESTATUS = GAMEWON;
 			clearInterval(tmr);
 
+			// Run this now, so we know whether player completed without using flags
+			// before we mark all the bombs with flags
+			countFlaggedSquares();
+
 			// Flag remaining hidden bombs
 			for (x = 0; x < FIELDWIDTH; x += 1) {
 				for (y = 0; y < FIELDHEIGHT; y += 1) {
@@ -562,7 +604,6 @@ function userKeyUp(evt) {
 // I: 16 × 16 field with 40 mines and 256 x 256 grid
 // E: 30 × 16 field with 99 mines and 480 x 256 grid
 function newGame(size) {
-	bombsIdentified = 0;
 	seconds = 0;
 	if(tmr) {
 		clearInterval(tmr);
