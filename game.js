@@ -461,16 +461,24 @@ function saveScore() {
     }, 2500);
 }
 
+function withinBounds(evt) {
+	if ((evt.pageX - canvas.offsetLeft) > WINDOWBORDER &&
+		(evt.pageX - canvas.offsetLeft) < CANVASWIDTH-WINDOWBORDER &&
+		(evt.pageY - canvas.offsetTop) > 55 &&
+		(evt.pageY - canvas.offsetTop) < CANVASHEIGHT-WINDOWBORDER ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 function userMousedDown(evt) {
 	evt.preventDefault();
 
 	clickX = Math.floor(((evt.pageX - canvas.offsetLeft) - WINDOWBORDER) / 16);
 	clickY = Math.floor(((evt.pageY - canvas.offsetTop) - (WINDOWBORDER * 2) - SCOREHEIGHT) / 16);
 
-	if ((evt.pageX - canvas.offsetLeft) > WINDOWBORDER &&
-		(evt.pageX - canvas.offsetLeft) < CANVASWIDTH-WINDOWBORDER &&
-		(evt.pageY - canvas.offsetTop) > 55 &&
-		(evt.pageY - canvas.offsetTop) < CANVASHEIGHT-WINDOWBORDER ) {
+	if ( withinBounds(evt) ) {
 		if (GAMESTATUS === GAMEPLAYING) {
 			if (guesses[clickX][clickY] === NOTGUESSED) {
 				guesses[clickX][clickY] = MOUSEDOWN;
@@ -496,10 +504,7 @@ function userMousedUp(evt) {
 		// If right-click
 		if (evt.button === 2) {
 			// If clicked on game board
-			if ((evt.pageX - canvas.offsetLeft) > WINDOWBORDER &&
-				(evt.pageX - canvas.offsetLeft) < CANVASWIDTH-WINDOWBORDER &&
-				(evt.pageY - canvas.offsetTop) > 55 &&
-				(evt.pageY - canvas.offsetTop) < CANVASHEIGHT-WINDOWBORDER ) {
+			if ( withinBounds(evt) ) {
 				if (GAMESTATUS === GAMEPLAYING) { // Only let the player make changes when the game is still going
 					if (guesses[clickX][clickY] === MARKED) {
 						guesses[clickX][clickY] = NOTGUESSED;
