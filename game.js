@@ -41,6 +41,9 @@ var MARKSON = 0;
 
 var SUBMITTINGSCORE = 0;
 
+var NOTCHECKED = 0;
+var CHECKED = 1;
+
 var clickX, clickY;
 
 var squares = [];			// array that holds bombs and neighbouring counts
@@ -122,9 +125,6 @@ function countClearedSquares() {
 		}
 	}
 }
-
-var NOTCHECKED = 0;
-var CHECKED = 1;
 
 function isBomb(i, j) {
 	var retVal = 0;
@@ -509,8 +509,6 @@ function userMousedUp(evt) {
 						} else {
 							guesses[clickX][clickY] = NOTGUESSED;
 						}
-					} else if (guesses[clickX][clickY] === GUESSED) {
-						// Do nothing to squares that have already been cleared
 					} else {
 						guesses[clickX][clickY] = FLAGGED;
 					}
