@@ -104,26 +104,16 @@ function resetArrays() {
     }
 }
 
-function countFlaggedSquares() {
-	squaresFlagged = 0;
+function countSquares(type) {
+	var result = 0;
 	for (x = 0; x < FIELDWIDTH; x += 1) {
 		for (y = 0; y < FIELDHEIGHT; y += 1) {
-			if (guesses[x][y] === FLAGGED) {
-				squaresFlagged += 1;
+			if (guesses[x][y] === type) {
+				result += 1;
 			}
 		}
 	}
-}
-
-function countClearedSquares() {
-	squaresCleared = 0;
-	for (x = 0; x < FIELDWIDTH; x += 1) {
-		for (y = 0; y < FIELDHEIGHT; y += 1) {
-			if (guesses[x][y] === GUESSED) {
-				squaresCleared += 1;
-			}
-		}
-	}
+	return result;
 }
 
 function isBomb(i, j) {
@@ -173,7 +163,7 @@ function drawField() {
 	context.drawImage(sprite, 0, 39, 41, 25, COUNTERWIDTH-35, WINDOWBORDER+4, 41, 25);
 
 	// Drawing count of identified bombs
-	countFlaggedSquares();
+	squaresFlagged = countSquares(FLAGGED);
 	strRemainingBombCount = String(NUMBEROFBOMBS-squaresFlagged);
 	strlen = strRemainingBombCount.length;
 	if (strlen === 3) {
@@ -553,7 +543,7 @@ function userMousedUp(evt) {
 						if(squares[clickX][clickY] === EMPTY) {
 							checkForAdjacentBlanks(clickX, clickY);
 						}
-						countClearedSquares();
+						squaresCleared = countSquares(GUESSED);
 					}
 				}
 			}
@@ -565,7 +555,7 @@ function userMousedUp(evt) {
 
 			// Run this now, so we know whether player completed without using flags
 			// before we mark all the bombs with flags
-			countFlaggedSquares();
+			squaresFlagged = countSquares(FLAGGED);
 
 			// Flag remaining hidden bombs
 			for (x = 0; x < FIELDWIDTH; x += 1) {
