@@ -173,22 +173,20 @@ function drawBombCount() {
 		if (strRemainingBombCount[0] === '-') {
 			context.drawImage(sprite, 130, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-			context.drawImage(sprite, (parseInt(strRemainingBombCount[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 		} else {
 			context.drawImage(sprite, (parseInt(strRemainingBombCount[0], 10))*13, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-			context.drawImage(sprite, (parseInt(strRemainingBombCount[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 		}
+		context.drawImage(sprite, (parseInt(strRemainingBombCount[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 2) {
 		if (strRemainingBombCount[0] === '-') {
 			context.drawImage(sprite, 130, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 			context.drawImage(sprite,   0, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 		} else {
 			context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 			context.drawImage(sprite, (parseInt(strRemainingBombCount[0], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
-			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 		}
+		context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 1) {
 		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
