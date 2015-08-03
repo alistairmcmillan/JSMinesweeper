@@ -132,6 +132,8 @@ var context;
 var sprite;
 
 function drawFrame() {
+	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
+
 	// Draw top border
     context.drawImage(sprite, 208, 0,            WINDOWBORDER, WINDOWBORDER, 0,                          0,                            WINDOWBORDER,                     WINDOWBORDER);
     context.drawImage(sprite, 219, 0,            1,            WINDOWBORDER, WINDOWBORDER,               0,                            CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
@@ -150,13 +152,6 @@ function drawFrame() {
     context.drawImage(sprite, 208, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, 0,                          (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
     context.drawImage(sprite, 219, (WINDOWBORDER*2)+3, 1,            WINDOWBORDER, WINDOWBORDER,               (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
     context.drawImage(sprite, 222, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
-}
-
-function drawCounters() {
-	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
-	var strRemainingBombCount;
-	var strlen;
-	var strSeconds;
 
 	// Drawing background for counters
     context.drawImage(sprite, 5, 5, 6, 6, WINDOWBORDER, WINDOWBORDER, COUNTERWIDTH, SCOREHEIGHT);
@@ -164,6 +159,11 @@ function drawCounters() {
 	// Drawing housings for counters
 	context.drawImage(sprite, 0, 39, 41, 25, WINDOWBORDER+5, WINDOWBORDER+4, 41, 25);
 	context.drawImage(sprite, 0, 39, 41, 25, COUNTERWIDTH-35, WINDOWBORDER+4, 41, 25);
+}
+
+function drawBombCount() {
+	var strRemainingBombCount;
+	var strlen;
 
 	// Drawing count of identified bombs
 	squaresFlagged = countSquares(FLAGGED);
@@ -194,6 +194,11 @@ function drawCounters() {
 		context.drawImage(sprite, 0, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
 		context.drawImage(sprite, (parseInt(strRemainingBombCount[0], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	}
+}
+
+function drawSecondCount() {
+	var strlen;
+	var strSeconds;
 
 	// Drawing seconds counter
 	if(seconds < 1000) {
@@ -215,6 +220,10 @@ function drawCounters() {
 		context.drawImage(sprite, 0, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-32, WINDOWBORDER+5, 13, 23);
 		context.drawImage(sprite, (parseInt(strSeconds[0], 10))*13, 16, 13, 23, CANVASWIDTH-WINDOWBORDER-19, WINDOWBORDER+5, 13, 23);
 	}
+}
+
+function drawSmiley() {
+	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
 
 	// Drawing game status smiley
 	switch (GAMESTATUS)  {
@@ -356,7 +365,9 @@ function checkForAdjacentBlanks(r, s) {
 function clock() {
 	seconds += 1;
 	drawFrame();
-	drawCounters();
+	drawBombCount();
+	drawSecondCount();
+	drawSmiley();
     drawField();
 }
 
@@ -388,8 +399,10 @@ function userMousedOut() {
 		mousebtnheld = 0;
 	}
 	drawFrame();
-	drawCounters();
-	drawField();
+	drawBombCount();
+	drawSecondCount();
+	drawSmiley();
+    drawField();
 }
 
 function loadScores() {
@@ -486,7 +499,9 @@ function userMousedDown(evt) {
 		}
 	}
 	drawFrame();
-	drawCounters();
+	drawBombCount();
+	drawSecondCount();
+	drawSmiley();
     drawField();
 }
 
@@ -584,7 +599,9 @@ function userMousedUp(evt) {
 		}
 	}
 	drawFrame();
-	drawCounters();
+	drawBombCount();
+	drawSecondCount();
+	drawSmiley();
     drawField();
 }
 
@@ -662,7 +679,9 @@ function newGame(size) {
     // Draw minefield
     sprite.onload = function() {
         drawFrame();
-        drawCounters();
+        drawBombCount();
+        drawSecondCount();
+        drawSmiley();
         drawField();
     };
 }
