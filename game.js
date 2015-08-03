@@ -130,12 +130,8 @@ function isBomb(i, j) {
 var canvas;
 var context;
 var sprite;
-function drawField() {
-	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
-	var strRemainingBombCount;
-	var strlen;
-	var strSeconds;
 
+function drawFrame() {
 	// Draw top border
     context.drawImage(sprite, 208, 0,            WINDOWBORDER, WINDOWBORDER, 0,                          0,                            WINDOWBORDER,                     WINDOWBORDER);
     context.drawImage(sprite, 219, 0,            1,            WINDOWBORDER, WINDOWBORDER,               0,                            CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
@@ -154,6 +150,13 @@ function drawField() {
     context.drawImage(sprite, 208, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, 0,                          (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
     context.drawImage(sprite, 219, (WINDOWBORDER*2)+3, 1,            WINDOWBORDER, WINDOWBORDER,               (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     CANVASWIDTH - (WINDOWBORDER * 2), WINDOWBORDER);
     context.drawImage(sprite, 222, (WINDOWBORDER*2)+3, WINDOWBORDER, WINDOWBORDER, CANVASWIDTH - WINDOWBORDER, (WINDOWBORDER*2)+SCOREHEIGHT+(16 * FIELDHEIGHT),     WINDOWBORDER,                     WINDOWBORDER);
+}
+
+function drawCounters() {
+	var COUNTERWIDTH = CANVASWIDTH - (WINDOWBORDER * 2);
+	var strRemainingBombCount;
+	var strlen;
+	var strSeconds;
 
 	// Drawing background for counters
     context.drawImage(sprite, 5, 5, 6, 6, WINDOWBORDER, WINDOWBORDER, COUNTERWIDTH, SCOREHEIGHT);
@@ -224,7 +227,9 @@ function drawField() {
 		default:
 			context.drawImage(sprite, 41, 39, 27, 27, (COUNTERWIDTH/2)+WINDOWBORDER-13, WINDOWBORDER+2, 27, 27);
 	}
+}
 
+function drawField() {
 	// Drawing actual minefield
     for (x = 0; x < FIELDWIDTH; x += 1) {
         for (y = 0; y < FIELDHEIGHT; y += 1) {
@@ -350,6 +355,8 @@ function checkForAdjacentBlanks(r, s) {
 
 function clock() {
 	seconds += 1;
+	drawFrame();
+	drawCounters();
     drawField();
 }
 
@@ -380,6 +387,8 @@ function userMousedOut() {
 		guesses[clickX][clickY] = NOTGUESSED;
 		mousebtnheld = 0;
 	}
+	drawFrame();
+	drawCounters();
 	drawField();
 }
 
@@ -476,6 +485,8 @@ function userMousedDown(evt) {
 			mousebtnheld = 1;
 		}
 	}
+	drawFrame();
+	drawCounters();
     drawField();
 }
 
@@ -572,6 +583,8 @@ function userMousedUp(evt) {
 			}
 		}
 	}
+	drawFrame();
+	drawCounters();
     drawField();
 }
 
@@ -648,6 +661,8 @@ function newGame(size) {
 
     // Draw minefield
     sprite.onload = function() {
+        drawFrame();
+        drawCounters();
         drawField();
     };
 }
