@@ -50,6 +50,17 @@ var squares = [];			// array that holds bombs and neighbouring counts
 var guesses = [];			// array that holds players changes to board
 var checks = [];			// array that holds whether square has been checked this turn
 
+function isBomb(i, j) {
+	var retVal = 0;
+    // We don't want to check off the side of the grid
+    if (i > -1 && i < FIELDWIDTH && j > -1 && j < FIELDHEIGHT) {
+        if (squares[i][j] === BOMB) {
+            retVal = 1;
+        }
+    }
+    return retVal;
+}
+
 function resetArrays() {
 	var randomX, randomY, count;
 
@@ -114,17 +125,6 @@ function countSquares(type) {
 		}
 	}
 	return result;
-}
-
-function isBomb(i, j) {
-	var retVal = 0;
-    // We don't want to check off the side of the grid
-    if (i > -1 && i < FIELDWIDTH && j > -1 && j < FIELDHEIGHT) {
-        if (squares[i][j] === BOMB) {
-            retVal = 1;
-        }
-    }
-    return retVal;
 }
 
 var canvas;
@@ -503,6 +503,66 @@ function userMousedDown(evt) {
     drawField();
 }
 
+function newGame(size) {
+	seconds = 0;
+	if(tmr) {
+		clearInterval(tmr);
+	}
+	GAMESTATUS = NOGAME;
+
+    canvas = document.getElementById('canvas');
+	document.getElementById('beginneranchor').innerHTML = "<u>B</u>eginner";
+	document.getElementById('intermediateanchor').innerHTML = "<u>I</u>ntermediate";
+	document.getElementById('expertanchor').innerHTML = "<u>E</u>xpert";
+
+	if (size === 40) {
+		FIELDWIDTH = 16;
+		FIELDHEIGHT = 16;
+		CURRENTGAME = NUMBEROFBOMBS = 40;
+		document.getElementById('intermediateanchor').innerHTML = "&#10003;&nbsp;<u>I</u>ntermediate";
+	} else if (size === 99) {
+		FIELDWIDTH = 30;
+		FIELDHEIGHT = 16;
+		CURRENTGAME = NUMBEROFBOMBS = 99;
+		document.getElementById('expertanchor').innerHTML = "&#10003;&nbsp;<u>E</u>xpert";
+	} else {
+		FIELDWIDTH = 9;
+		FIELDHEIGHT = 9;
+		CURRENTGAME = NUMBEROFBOMBS = 10;
+		document.getElementById('beginneranchor').innerHTML = "&#10003;&nbsp;<u>B</u>eginner";
+	}
+	CANVASWIDTH = (16 * FIELDWIDTH) + (WINDOWBORDER * 2);
+	CANVASHEIGHT = (16 * FIELDHEIGHT) + (WINDOWBORDER * 3) + SCOREHEIGHT;
+
+	document.getElementById('menubar').style.width = CANVASWIDTH + "px";
+	document.getElementById('field').style.width = CANVASWIDTH + "px";
+	document.getElementById('field').style.height = CANVASHEIGHT + "px";
+
+	canvas.width = CANVASWIDTH;
+	canvas.height = CANVASHEIGHT;
+    context = canvas.getContext('2d');
+
+	resetArrays();
+
+    canvas.addEventListener("contextmenu", userRightClicked, false);
+    canvas.addEventListener("mousedown", userMousedDown, false);
+    canvas.addEventListener("mouseout", userMousedOut, false);
+    canvas.addEventListener("mouseup", userMousedUp, false);
+    window.addEventListener("keyup", userKeyUp, false);
+
+    sprite = new Image();
+    sprite.src = 'mines.png';
+
+    // Draw minefield
+    sprite.onload = function() {
+        drawFrame();
+        drawBombCount();
+        drawSecondCount();
+        drawSmiley();
+        drawField();
+    };
+}
+
 function userMousedUp(evt) {
 	evt.preventDefault();
 
@@ -619,67 +679,4 @@ function userKeyUp(evt) {
 			newGame(CURRENTGAME);
 		}
 	}
-}
-
-// B:  9 ×  9 field with 10 mines and 144 x 144 grid
-// I: 16 × 16 field with 40 mines and 256 x 256 grid
-// E: 30 × 16 field with 99 mines and 480 x 256 grid
-function newGame(size) {
-	seconds = 0;
-	if(tmr) {
-		clearInterval(tmr);
-	}
-	GAMESTATUS = NOGAME;
-
-    canvas = document.getElementById('canvas');
-	document.getElementById('beginneranchor').innerHTML = "<u>B</u>eginner";
-	document.getElementById('intermediateanchor').innerHTML = "<u>I</u>ntermediate";
-	document.getElementById('expertanchor').innerHTML = "<u>E</u>xpert";
-
-	if (size === 40) {
-		FIELDWIDTH = 16;
-		FIELDHEIGHT = 16;
-		CURRENTGAME = NUMBEROFBOMBS = 40;
-		document.getElementById('intermediateanchor').innerHTML = "&#10003;&nbsp;<u>I</u>ntermediate";
-	} else if (size === 99) {
-		FIELDWIDTH = 30;
-		FIELDHEIGHT = 16;
-		CURRENTGAME = NUMBEROFBOMBS = 99;
-		document.getElementById('expertanchor').innerHTML = "&#10003;&nbsp;<u>E</u>xpert";
-	} else {
-		FIELDWIDTH = 9;
-		FIELDHEIGHT = 9;
-		CURRENTGAME = NUMBEROFBOMBS = 10;
-		document.getElementById('beginneranchor').innerHTML = "&#10003;&nbsp;<u>B</u>eginner";
-	}
-	CANVASWIDTH = (16 * FIELDWIDTH) + (WINDOWBORDER * 2);
-	CANVASHEIGHT = (16 * FIELDHEIGHT) + (WINDOWBORDER * 3) + SCOREHEIGHT;
-
-	document.getElementById('menubar').style.width = CANVASWIDTH + "px";
-	document.getElementById('field').style.width = CANVASWIDTH + "px";
-	document.getElementById('field').style.height = CANVASHEIGHT + "px";
-
-	canvas.width = CANVASWIDTH;
-	canvas.height = CANVASHEIGHT;
-    context = canvas.getContext('2d');
-
-	resetArrays();
-
-    canvas.addEventListener("contextmenu", userRightClicked, false);
-    canvas.addEventListener("mousedown", userMousedDown, false);
-    canvas.addEventListener("mouseout", userMousedOut, false);
-    canvas.addEventListener("mouseup", userMousedUp, false);
-    window.addEventListener("keyup", userKeyUp, false);
-
-    sprite = new Image();
-    sprite.src = 'mines.png';
-
-    // Draw minefield
-    sprite.onload = function() {
-        drawFrame();
-        drawBombCount();
-        drawSecondCount();
-        drawSmiley();
-        drawField();
-    };
 }
