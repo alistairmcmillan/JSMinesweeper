@@ -170,7 +170,7 @@ function drawBombCount() {
 	strRemainingBombCount = String(NUMBEROFBOMBS-squaresFlagged);
 	strlen = strRemainingBombCount.length;
 	if (strlen === 3) {
-		if (strRemainingBombCount[0] === '-') {
+		if (strRemainingBombCount[0] === "-") {
 			context.drawImage(sprite, 130, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 			context.drawImage(sprite, (parseInt(strRemainingBombCount[1], 10))*13, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
 		} else {
@@ -372,23 +372,23 @@ function clock() {
 function setMarks() {
 	if(MARKSON === 1) {
 		MARKSON = 0;
-		document.getElementById('marksanchor').innerHTML = "<u>M</u>arks (?)";
+		document.getElementById("marksanchor").innerHTML = "<u>M</u>arks (?)";
 	} else {
 		MARKSON = 1;
-		document.getElementById('marksanchor').innerHTML = "&#10003;&nbsp;<u>M</u>arks (?)";
+		document.getElementById("marksanchor").innerHTML = "&#10003;&nbsp;<u>M</u>arks (?)";
 	}
 }
 
 function showScores() {
-	if(document.getElementById('scorediv').style.display === "none") {
-		document.getElementById('scorediv').style.display = "block";
+	if(document.getElementById("scorediv").style.display === "none") {
+		document.getElementById("scorediv").style.display = "block";
 	} else {
-		document.getElementById('scorediv').style.display = "none";
+		document.getElementById("scorediv").style.display = "none";
 	}
 }
 
 function hideScores() {
-	document.getElementById('scorediv').style.display = "none";
+	document.getElementById("scorediv").style.display = "none";
 }
 
 function userMousedOut() {
@@ -413,13 +413,13 @@ function loadScores() {
 				if (currentLevel !== rows[i].level) {
 					switch(rows[i].level) {
 						case '1':
-							$('table#scoretable tbody').append('<tr><th>Beginner</th></tr>');
+							$('table#scoretable tbody').append("<tr><th>Beginner</th></tr>");
 							break;
 						case '2':
-							$('table#scoretable tbody').append('<tr><th>Intermediate</th></tr>');
+							$('table#scoretable tbody').append("<tr><th>Intermediate</th></tr>");
 							break;
 						case '3':
-							$('table#scoretable tbody').append('<tr><th>Expert</th></tr>');
+							$('table#scoretable tbody').append("<tr><th>Expert</th></tr>");
 							break;
 					}
 					currentLevel = rows[i].level;
@@ -459,12 +459,12 @@ function saveScore() {
 		withoutflags = 0;
 	}
 	$.ajax({
-		url: 'save_score.php', data: { level: currentlevel, name: document.getElementById('nomdeplume').value, time: seconds, withoutflags: withoutflags }, dataType: 'json',  success: function(rows)
+		url: 'save_score.php', data: { level: currentlevel, name: document.getElementById("nomdeplume").value, time: seconds, withoutflags: withoutflags }, dataType: 'json',  success: function(rows)
 		{
 			// Do stuff
 		}
 	});
-	document.getElementById('newscorediv').style.display = "none";
+	document.getElementById("newscorediv").style.display = "none";
 	SUBMITTINGSCORE = 0;
 	setTimeout(function () {
 		loadScores();
@@ -510,37 +510,37 @@ function newGame(size) {
 	}
 	GAMESTATUS = NOGAME;
 
-    canvas = document.getElementById('canvas');
-	document.getElementById('beginneranchor').innerHTML = "<u>B</u>eginner";
-	document.getElementById('intermediateanchor').innerHTML = "<u>I</u>ntermediate";
-	document.getElementById('expertanchor').innerHTML = "<u>E</u>xpert";
+    canvas = document.getElementById("canvas");
+	document.getElementById("beginneranchor").innerHTML = "<u>B</u>eginner";
+	document.getElementById("intermediateanchor").innerHTML = "<u>I</u>ntermediate";
+	document.getElementById("expertanchor").innerHTML = "<u>E</u>xpert";
 
 	if (size === 40) {
 		FIELDWIDTH = 16;
 		FIELDHEIGHT = 16;
 		CURRENTGAME = NUMBEROFBOMBS = 40;
-		document.getElementById('intermediateanchor').innerHTML = "&#10003;&nbsp;<u>I</u>ntermediate";
+		document.getElementById("intermediateanchor").innerHTML = "&#10003;&nbsp;<u>I</u>ntermediate";
 	} else if (size === 99) {
 		FIELDWIDTH = 30;
 		FIELDHEIGHT = 16;
 		CURRENTGAME = NUMBEROFBOMBS = 99;
-		document.getElementById('expertanchor').innerHTML = "&#10003;&nbsp;<u>E</u>xpert";
+		document.getElementById("expertanchor").innerHTML = "&#10003;&nbsp;<u>E</u>xpert";
 	} else {
 		FIELDWIDTH = 9;
 		FIELDHEIGHT = 9;
 		CURRENTGAME = NUMBEROFBOMBS = 10;
-		document.getElementById('beginneranchor').innerHTML = "&#10003;&nbsp;<u>B</u>eginner";
+		document.getElementById("beginneranchor").innerHTML = "&#10003;&nbsp;<u>B</u>eginner";
 	}
 	CANVASWIDTH = (16 * FIELDWIDTH) + (WINDOWBORDER * 2);
 	CANVASHEIGHT = (16 * FIELDHEIGHT) + (WINDOWBORDER * 3) + SCOREHEIGHT;
 
-	document.getElementById('menubar').style.width = CANVASWIDTH + "px";
-	document.getElementById('field').style.width = CANVASWIDTH + "px";
-	document.getElementById('field').style.height = CANVASHEIGHT + "px";
+	document.getElementById("menubar").style.width = CANVASWIDTH + "px";
+	document.getElementById("field").style.width = CANVASWIDTH + "px";
+	document.getElementById("field").style.height = CANVASHEIGHT + "px";
 
 	canvas.width = CANVASWIDTH;
 	canvas.height = CANVASHEIGHT;
-    context = canvas.getContext('2d');
+    context = canvas.getContext("2d");
 
 	resetArrays();
 
@@ -652,7 +652,7 @@ function userMousedUp(evt) {
 
 			if (seconds < 999) {
 				SUBMITTINGSCORE = 1;
-				document.getElementById('newscorediv').style.display = "block";
+				document.getElementById("newscorediv").style.display = "block";
 			}
 		}
 	}
