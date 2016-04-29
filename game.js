@@ -459,7 +459,7 @@ function saveScore() {
 		withoutflags = 0;
 	}
 	$.ajax({
-		url: 'save_score.php', data: { level: currentlevel, name: document.getElementById("nomdeplume").value, time: seconds, withoutflags: withoutflags }, dataType: 'json',  success: function(rows)
+		url: "save_score.php", data: { level: currentlevel, name: document.getElementById("nomdeplume").value, time: seconds, withoutflags: withoutflags }, dataType: "json",  success: function(rows)
 		{
 			// Do stuff
 		}
