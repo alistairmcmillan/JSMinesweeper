@@ -179,7 +179,7 @@ function drawBombCount() {
 		}
 		context.drawImage(sprite, (parseInt(strRemainingBombCount[2], 10))*13, 16, 13, 23, WINDOWBORDER+32, WINDOWBORDER+5, 13, 23);
 	} else if (strlen === 2) {
-		if (strRemainingBombCount[0] === '-') {
+		if (strRemainingBombCount[0] === "-") {
 			context.drawImage(sprite, 130, 16, 13, 23, WINDOWBORDER+6, WINDOWBORDER+5, 13, 23);
 			context.drawImage(sprite,   0, 16, 13, 23, WINDOWBORDER+19, WINDOWBORDER+5, 13, 23);
 		} else {
@@ -408,31 +408,31 @@ function loadScores() {
 		url: 'get_scores.php', data: "", dataType: 'json',  success: function(rows)
 		{
 			var currentLevel = 0;
-			$('table#scoretable tbody tr').remove();
+			$("table#scoretable tbody tr").remove();
 			for(var i = 0; i < rows.length; i++) {
 				if (currentLevel !== rows[i].level) {
 					switch(rows[i].level) {
-						case '1':
-							$('table#scoretable tbody').append("<tr><th>Beginner</th></tr>");
+						case "1":
+							$("table#scoretable tbody").append("<tr><th>Beginner</th></tr>");
 							break;
-						case '2':
-							$('table#scoretable tbody').append("<tr><th>Intermediate</th></tr>");
+						case "2":
+							$("table#scoretable tbody").append("<tr><th>Intermediate</th></tr>");
 							break;
-						case '3':
-							$('table#scoretable tbody').append("<tr><th>Expert</th></tr>");
+						case "3":
+							$("table#scoretable tbody").append("<tr><th>Expert</th></tr>");
 							break;
 					}
 					currentLevel = rows[i].level;
 				}
 				var t = rows[i].date.split(/[- :]/);
 				var d = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
-				var strWithoutFlags = '';
-				if (rows[i].withoutflags === '1') {
-					strWithoutFlags = '<td><img src="sunglasses.png" width=12 height=12 alt="Completed without using flags" title="Completed without using flags" /></td>';
+				var strWithoutFlags = "";
+				if (rows[i].withoutflags === "1") {
+					strWithoutFlags = "<td><img src=\"sunglasses.png\" width=12 height=12 alt=\"Completed without using flags\" title=\"Completed without using flags\" /></td>";
 				} else {
-					strWithoutFlags = '<td></td>';
+					strWithoutFlags = "<td></td>";
 				}
-				$('table#scoretable tbody').append('<tr><td></td><td>' + rows[i].time + ' seconds</td>' + strWithoutFlags + '<td>' + rows[i].name + '</td><td>' + ( d.getHours() < 10 ? "0" : "" ) + d.getHours() + ':' + ( d.getMinutes() < 10 ? "0" : "" ) + d.getMinutes() + ' ' + ( d.getDate() < 10 ? "0" : "" ) + d.getDate() + '/' + ( (d.getMonth()+1) < 10 ? "0" : "" ) + (d.getMonth()+1) + '/' + d.getFullYear() + '</td></tr>');
+				$("table#scoretable tbody").append("<tr><td></td><td>" + rows[i].time + " seconds</td>" + strWithoutFlags + "<td>" + rows[i].name + "</td><td>" + ( d.getHours() < 10 ? "0" : "" ) + d.getHours() + ":" + ( d.getMinutes() < 10 ? "0" : "" ) + d.getMinutes() + " " + ( d.getDate() < 10 ? "0" : "" ) + d.getDate() + "/" + ( (d.getMonth()+1) < 10 ? "0" : "" ) + (d.getMonth()+1) + "/" + d.getFullYear() + "</td></tr>");
 			}
 		}
 	});
@@ -669,7 +669,7 @@ function newGame(size) {
     window.addEventListener("keyup", userKeyUp, false);
 
     sprite = new Image();
-    sprite.src = 'mines.png';
+    sprite.src = "mines.png";
 
     // Draw minefield
     sprite.onload = function() {
