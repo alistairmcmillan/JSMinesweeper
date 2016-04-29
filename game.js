@@ -405,7 +405,7 @@ function userMousedOut() {
 
 function loadScores() {
     $.ajax({
-		url: 'get_scores.php', data: "", dataType: 'json',  success: function(rows)
+		url: 'get_scores.php', data: "", dataType: 'json',  success(rows)
 		{
 			var currentLevel = 0;
 			$("table#scoretable tbody tr").remove();
@@ -459,7 +459,7 @@ function saveScore() {
 		withoutflags = 0;
 	}
 	$.ajax({
-		url: "save_score.php", data: { level: currentlevel, name: document.getElementById("nomdeplume").value, time: seconds, withoutflags: withoutflags }, dataType: "json",  success: function(rows)
+		url: "save_score.php", data: { level: currentlevel, name: document.getElementById("nomdeplume").value, time: seconds, withoutflags: withoutflags }, dataType: "json",  success(rows)
 		{
 			// Do stuff
 		}
