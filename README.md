@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f68e00a6d689406e99ba41108daeb0fd)](https://www.codacy.com/app/alistairmcmillan75/JSMinesweeper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=alistairmcmillan/JSMinesweeper&amp;utm_campaign=Badge_Grade)
+
 JSMinesweeper
 =============
 
