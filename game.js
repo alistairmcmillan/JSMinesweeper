@@ -492,6 +492,14 @@ function userMousedDown(evt) {
     drawField();
 }
 
+function markAllGuessed() {
+	for (x = 0; x < FIELDWIDTH; x += 1) {
+		for (y = 0; y < FIELDHEIGHT; y += 1) {
+			guesses[x][y] = GUESSED;
+		}
+	}
+}
+
 function processGameBoardClick(evt) {
     if (evt.button === 2) {
 		if (GAMESTATUS === GAMEPLAYING) { // Only let the player make changes when the game is still going
@@ -516,11 +524,7 @@ function processGameBoardClick(evt) {
 
 		if (GAMESTATUS === GAMEPLAYING) {
 			if (squares[clickX][clickY] === BOMB) {
-				for (x = 0; x < FIELDWIDTH; x += 1) {
-					for (y = 0; y < FIELDHEIGHT; y += 1) {
-						guesses[x][y] = GUESSED;
-					}
-				}
+				markAllGuessed();
 				squares[clickX][clickY] = EXPLODED;
 				GAMESTATUS = GAMELOST;
 				clearInterval(tmr);
@@ -545,7 +549,6 @@ function flagRemainingHiddenBombs() {
 		}
 	}
 }
-
 
 function userMousedUp(evt) {
 	evt.preventDefault();
