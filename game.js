@@ -238,22 +238,30 @@ function drawSmiley() {
 }
 
 function drawField() {
+	var srcX = 0;
+	var srcY = 0;
 	// Drawing actual minefield
     for (x = 0; x < FIELDWIDTH; x += 1) {
         for (y = 0; y < FIELDHEIGHT; y += 1) {
 			// Adding 33 to give space for the bombs and time counters
 			// Add 13 to x and y to give space for border
             if (guesses[x][y] === MOUSEDOWN) {
-                context.drawImage(sprite, 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                srcX = 16;
+                srcY = 0;
             } else if (guesses[x][y] === MARKED) {
-                context.drawImage(sprite, 143, 16, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                srcX = 143;
+                srcY = 16;
             } else if (guesses[x][y] === FLAGGED) {
-                context.drawImage(sprite, 64, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                srcX = 64;
+                srcY = 0;
             } else if (guesses[x][y] === GUESSED) {
-                context.drawImage(sprite, squares[x][y] * 16, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                srcX = squares[x][y] * 16;
+                srcY = 0;
             } else {
-                context.drawImage(sprite, 0, 0, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
+                srcX = 0;
+                srcY = 0;
             }
+            context.drawImage(sprite, srcX, srcY, 16, 16, (x * 16) + WINDOWBORDER, (y * 16) + (WINDOWBORDER * 2) + SCOREHEIGHT, 16, 16);
         }
     }
 }
