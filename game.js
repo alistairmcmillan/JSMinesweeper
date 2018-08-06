@@ -492,7 +492,7 @@ function userMousedDown(evt) {
     drawField();
 }
 
-function processGameClick(evt) {
+function processGameBoardClick(evt) {
     if (evt.button === 2) {
 		if (GAMESTATUS === GAMEPLAYING) { // Only let the player make changes when the game is still going
 			if (guesses[clickX][clickY] === MARKED) {
@@ -536,6 +536,17 @@ function processGameClick(evt) {
 	}
 }
 
+function flagRemainingHiddenBombs() {
+	for (x = 0; x < FIELDWIDTH; x += 1) {
+		for (y = 0; y < FIELDHEIGHT; y += 1) {
+			if (squares[x][y] === BOMB) {
+				guesses[x][y] = FLAGGED;
+			}
+		}
+	}
+}
+
+
 function userMousedUp(evt) {
 	evt.preventDefault();
 
@@ -552,7 +563,7 @@ function userMousedUp(evt) {
 		if (evt.button === 2) {
 			// If clicked on game board
 			if ( withinBounds(evt) ) {
-				processGameClick(evt);
+				processGameBoardClick(evt);
 			}
 			/*
 			*/
@@ -565,7 +576,7 @@ function userMousedUp(evt) {
 				(evt.pageY - canvas.offsetTop) < WINDOWBORDER+29 ) {
 				newGame(CURRENTGAME);
 			} else {
-				processGameClick(evt);
+				processGameBoardClick(evt);
 			}
 		}
 
@@ -577,14 +588,7 @@ function userMousedUp(evt) {
 			// before we mark all the bombs with flags
 			squaresFlagged = countSquares(FLAGGED);
 
-			// Flag remaining hidden bombs
-			for (x = 0; x < FIELDWIDTH; x += 1) {
-				for (y = 0; y < FIELDHEIGHT; y += 1) {
-					if (squares[x][y] === BOMB) {
-						guesses[x][y] = FLAGGED;
-					}
-				}
-			}
+			flagRemainingHiddenBombs();
 
 			if (seconds < 999) {
 				SUBMITTINGSCORE = 1;
