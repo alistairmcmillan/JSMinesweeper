@@ -492,6 +492,50 @@ function userMousedDown(evt) {
     drawField();
 }
 
+function processGameClick(evt) {
+    if (evt.button === 2) {
+		if (GAMESTATUS === GAMEPLAYING) { // Only let the player make changes when the game is still going
+			if (guesses[clickX][clickY] === MARKED) {
+				guesses[clickX][clickY] = NOTGUESSED;
+			} else if (guesses[clickX][clickY] === FLAGGED) {
+				if (MARKSON) {
+					guesses[clickX][clickY] = MARKED;
+				} else {
+					guesses[clickX][clickY] = NOTGUESSED;
+				}
+			} else {
+				guesses[clickX][clickY] = FLAGGED;
+			}
+		}
+	} else {
+		// If this is the first move, start the timer
+		if (GAMESTATUS !== GAMEPLAYING) {
+			GAMESTATUS = GAMEPLAYING;
+			tmr = setInterval(function(){clock();},1000);
+		}
+
+		if (GAMESTATUS === GAMEPLAYING) {
+			if (squares[clickX][clickY] === BOMB) {
+				for (x = 0; x < FIELDWIDTH; x += 1) {
+					for (y = 0; y < FIELDHEIGHT; y += 1) {
+						guesses[x][y] = GUESSED;
+					}
+				}
+				squares[clickX][clickY] = EXPLODED;
+				GAMESTATUS = GAMELOST;
+				clearInterval(tmr);
+			} else if (guesses[clickX][clickY] !== GUESSED) {
+				guesses[clickX][clickY] = GUESSED;
+				// Check for adjacent blanks is clicked square is empty
+				if(squares[clickX][clickY] === EMPTY) {
+					checkForAdjacentBlanks(clickX, clickY);
+				}
+				squaresCleared = countSquares(GUESSED);
+			}
+		}
+	}
+}
+
 function userMousedUp(evt) {
 	evt.preventDefault();
 
@@ -508,19 +552,7 @@ function userMousedUp(evt) {
 		if (evt.button === 2) {
 			// If clicked on game board
 			if ( withinBounds(evt) ) {
-				if (GAMESTATUS === GAMEPLAYING) { // Only let the player make changes when the game is still going
-					if (guesses[clickX][clickY] === MARKED) {
-						guesses[clickX][clickY] = NOTGUESSED;
-					} else if (guesses[clickX][clickY] === FLAGGED) {
-						if (MARKSON) {
-							guesses[clickX][clickY] = MARKED;
-						} else {
-							guesses[clickX][clickY] = NOTGUESSED;
-						}
-					} else {
-						guesses[clickX][clickY] = FLAGGED;
-					}
-				}
+				processGameClick(evt);
 			}
 			/*
 			*/
@@ -533,32 +565,7 @@ function userMousedUp(evt) {
 				(evt.pageY - canvas.offsetTop) < WINDOWBORDER+29 ) {
 				newGame(CURRENTGAME);
 			} else {
-				// If this is the first move, start the timer
-				if (GAMESTATUS !== GAMEPLAYING) {
-					// If this is the first move, start the timer
-					GAMESTATUS = GAMEPLAYING;
-					tmr = setInterval(function(){clock();},1000);
-				}
-
-				if (GAMESTATUS === GAMEPLAYING) {
-					if (squares[clickX][clickY] === BOMB) {
-						for (x = 0; x < FIELDWIDTH; x += 1) {
-							for (y = 0; y < FIELDHEIGHT; y += 1) {
-								guesses[x][y] = GUESSED;
-							}
-						}
-						squares[clickX][clickY] = EXPLODED;
-						GAMESTATUS = GAMELOST;
-						clearInterval(tmr);
-					} else if (guesses[clickX][clickY] !== GUESSED) {
-						guesses[clickX][clickY] = GUESSED;
-						// Check for adjacent blanks is clicked square is empty
-						if(squares[clickX][clickY] === EMPTY) {
-							checkForAdjacentBlanks(clickX, clickY);
-						}
-						squaresCleared = countSquares(GUESSED);
-					}
-				}
+				processGameClick(evt);
 			}
 		}
 
