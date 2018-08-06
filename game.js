@@ -258,9 +258,7 @@ function drawField() {
     }
 }
 
-var nest = 0;
 function checkForAdjacentBlanks(r, s) {
-	nest += 1;
 	if(s > 0) {
 		if (r > 0) {
 			if(squares[r - 1][s - 1] === EMPTY || squares[r - 1][s - 1] > 4) {
