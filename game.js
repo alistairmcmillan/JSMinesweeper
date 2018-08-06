@@ -273,9 +273,7 @@ function checkForAdjacentBlanks(r, s) {
 				guesses[r - 1][s - 1] = GUESSED;
 				if (checks[r - 1][s - 1] === NOTCHECKED) {
 					checks[r - 1][s - 1] = CHECKED;
-					if(squares[r - 1][s - 1] === EMPTY) {
-						checkForAdjacentBlanks(r - 1, s - 1);
-					}
+					if(squares[r - 1][s - 1] === EMPTY) { checkForAdjacentBlanks(r - 1, s - 1); }
 				}
 			}
 		}
@@ -283,9 +281,7 @@ function checkForAdjacentBlanks(r, s) {
 			if (checks[r][s - 1] === NOTCHECKED) {
 				checks[r][s - 1] = CHECKED;
 				guesses[r][s - 1] = GUESSED;
-				if(squares[r][s - 1] === EMPTY) {
-					checkForAdjacentBlanks(r, s - 1);
-				}
+				if(squares[r][s - 1] === EMPTY) { checkForAdjacentBlanks(r, s - 1); }
 			}
 		}
 		if (r < FIELDWIDTH-1) {
@@ -293,9 +289,7 @@ function checkForAdjacentBlanks(r, s) {
 				guesses[r + 1][s - 1] = GUESSED;
 				if (checks[r + 1][s - 1] === NOTCHECKED) {
 					checks[r + 1][s - 1] = CHECKED;
-					if(squares[r + 1][s - 1] === EMPTY) {
-						checkForAdjacentBlanks(r + 1, s - 1);
-					}
+					if(squares[r + 1][s - 1] === EMPTY) { checkForAdjacentBlanks(r + 1, s - 1); }
 				}
 			}
 		}
@@ -306,18 +300,14 @@ function checkForAdjacentBlanks(r, s) {
 			guesses[r - 1][s] = GUESSED;
 			if (checks[r - 1][s] === NOTCHECKED) {
 				checks[r - 1][s] = CHECKED;
-				if(squares[r - 1][s] === EMPTY) {
-					checkForAdjacentBlanks(r - 1, s);
-				}
+				if(squares[r - 1][s] === EMPTY) { checkForAdjacentBlanks(r - 1, s); }
 			}
 		}
 	}
 
 	if(squares[r][s] === EMPTY || squares[r][s] > 4) {
 		guesses[r][s] = GUESSED;
-		if (checks[r][s] === NOTCHECKED) {
-			checks[r][s] = CHECKED;
-		}
+		if (checks[r][s] === NOTCHECKED) { checks[r][s] = CHECKED; }
 	}
 
 	if (r < FIELDWIDTH-1) {
@@ -325,9 +315,7 @@ function checkForAdjacentBlanks(r, s) {
 			guesses[r + 1][s] = GUESSED;
 			if (checks[r + 1][s] === NOTCHECKED) {
 				checks[r + 1][s] = CHECKED;
-				if(squares[r + 1][s] === EMPTY) {
-					checkForAdjacentBlanks(r + 1, s);
-				}
+				if(squares[r + 1][s] === EMPTY) { checkForAdjacentBlanks(r + 1, s); }
 			}
 		}
 	}
@@ -338,9 +326,7 @@ function checkForAdjacentBlanks(r, s) {
 				guesses[r - 1][s + 1] = GUESSED;
 				if (checks[r - 1][s + 1] === NOTCHECKED) {
 					checks[r - 1][s + 1] = CHECKED;
-					if(squares[r - 1][s + 1] === EMPTY) {
-						checkForAdjacentBlanks(r - 1, s + 1);
-					}
+					if(squares[r - 1][s + 1] === EMPTY) { checkForAdjacentBlanks(r - 1, s + 1); }
 				}
 			}
 		}
@@ -348,9 +334,7 @@ function checkForAdjacentBlanks(r, s) {
 			guesses[r][s + 1] = GUESSED;
 			if (checks[r][s + 1] === NOTCHECKED) {
 				checks[r][s + 1] = CHECKED;
-				if(squares[r][s + 1] === EMPTY) {
-					checkForAdjacentBlanks(r, s + 1);
-				}
+				if(squares[r][s + 1] === EMPTY) { checkForAdjacentBlanks(r, s + 1); }
 			}
 		}
 		if (r < FIELDWIDTH-1) {
@@ -358,9 +342,7 @@ function checkForAdjacentBlanks(r, s) {
 				guesses[r + 1][s + 1] = GUESSED;
 				if (checks[r + 1][s + 1] === NOTCHECKED) {
 					checks[r + 1][s + 1] = CHECKED;
-					if(squares[r + 1][s + 1] === EMPTY) {
-						checkForAdjacentBlanks(r + 1, s + 1);
-					}
+					if(squares[r + 1][s + 1] === EMPTY) { checkForAdjacentBlanks(r + 1, s + 1); }
 				}
 			}
 		}
