@@ -116,6 +116,8 @@ div#scorediv th, div#scorediv td {
 	padding-right: 5px;
 	text-align: center;
 }
+
+tr:nth-child(even) {background: #DDD}
 </style>
 </head>
 
@@ -183,10 +185,10 @@ div#scorediv th, div#scorediv td {
 
 <div id='scorediv' style='display:none;'>
 <h1>Fastest Mine Sweepers</h1>
+<button id='hide' onClick='JavaScript:hideScores();'>Close</button>
 <table id='scoretable'>
 <tbody></tbody>
 </table>
-<button id='hide' onClick='JavaScript:hideScores();'>OK</button>
 </div>
 
 <div id='newscorediv' style='display:none;'>
