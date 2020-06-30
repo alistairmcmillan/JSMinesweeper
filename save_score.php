@@ -14,8 +14,7 @@
 	//--------------------------------------------------------------------------
 	// 1) Connect to mysql database
 	//--------------------------------------------------------------------------
-	$db_handle = mysql_connect($server, $user_name, $password);
-	$dbs = mysql_select_db($databaseName, $db_handle);
+	$mysqli = new mysqli($server, $user_name, $password, $databaseName);
 	
 	//--------------------------------------------------------------------------
 	// 2) Query database for data
